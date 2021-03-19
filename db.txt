@@ -1,0 +1,23 @@
+User{
+    id str
+    name str
+    email str
+}
+
+Project{
+    id str
+    name str
+    issues [Issue]
+    users [User]
+}
+
+Issue{
+    id str
+    name str
+    type str
+    desc str
+    bugTrace str
+
+    user User
+
+}

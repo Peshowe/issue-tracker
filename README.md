@@ -1,0 +1,1 @@
+An example app for tracking issues (the goal is to explore building apps using a microservice architecture and Go)
