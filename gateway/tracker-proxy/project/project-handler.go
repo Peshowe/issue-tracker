@@ -1,18 +1,14 @@
 package project
 
 import (
-	"io/ioutil"
-	// "context"
-	"github.com/Peshowe/issue-tracker/grpc-contract/tracker-service/v1/project"
-	// "google.golang.org/grpc"
 	"encoding/json"
-	// "fmt"
 	"github.com/Peshowe/issue-tracker/gateway/utils"
+	"github.com/Peshowe/issue-tracker/grpc-contract/tracker-service/v1/project"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"io/ioutil"
 	"net/http"
-	// "github.com/pkg/errors"
 )
 
 type ProjectHandler interface {
