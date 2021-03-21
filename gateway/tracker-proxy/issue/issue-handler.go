@@ -29,8 +29,31 @@ type handler struct {
 	issueClient issue.IssueServiceClient
 }
 
-func NewIssueHandler(grpcConn grpc.ClientConnInterface) IssueHandler {
+func newIssueHandler(grpcConn grpc.ClientConnInterface) IssueHandler {
 	return &handler{issueClient: issue.NewIssueServiceClient(grpcConn)}
+}
+
+//RegisterEndpoints registers the endpoints of our API for the issue subdomain
+func RegisterEndpoints(r chi.Router, grpcConn grpc.ClientConnInterface) {
+
+	issueHandler := newIssueHandler(grpcConn)
+
+	r.Route("/issues", func(r chi.Router) {
+
+		r.Get("/byid/{id}", issueHandler.GetIssueById)
+		r.Get("/byproject/{projectid}", issueHandler.GetIssuesByProject)
+		r.Get("/byuser/{userid}", issueHandler.GetIssuesByUser)
+
+		r.Post("/", issueHandler.CreateIssue)
+		r.Delete("/", issueHandler.DeleteIssue)
+
+		r.Put("/status", issueHandler.UpdateStatus)
+		r.Put("/user", issueHandler.UpdateUser)
+		r.Put("/description", issueHandler.UpdateDescription)
+		r.Put("/bugtrace", issueHandler.UpdateBugTrace)
+
+	})
+
 }
 
 func (h *handler) GetIssueById(w http.ResponseWriter, r *http.Request) {
@@ -82,6 +105,7 @@ func (h *handler) CreateIssue(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(errors.Wrap(err, "issueHandler.CreateIssue"), w)
 		return
 	}
+
 	resp, err := h.issueClient.CreateIssue(r.Context(), req)
 	if err != nil {
 		utils.HandleError(errors.Wrap(err, "issueHandler.CreateIssue"), w)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Peshowe/issue-tracker/gateway/tracker-proxy/issue"
 	"github.com/Peshowe/issue-tracker/gateway/tracker-proxy/project"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -19,8 +20,6 @@ func main() {
 		panic(err)
 	}
 
-	projectHandler := project.NewProjectHandler(conn)
-
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -32,8 +31,11 @@ func main() {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Get("/projects", projectHandler.GetProjectsAll)
-	r.Post("/project", projectHandler.CreateProject)
+	r.Route("/v1", func(r chi.Router) {
+
+		project.RegisterEndpoints(r, conn)
+		issue.RegisterEndpoints(r, conn)
+	})
 
 	errs := make(chan error, 2)
 	go func() {

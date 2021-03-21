@@ -35,8 +35,37 @@ type handler struct {
 	projectClient project.ProjectServiceClient
 }
 
-func NewProjectHandler(grpcConn grpc.ClientConnInterface) ProjectHandler {
+func newProjectHandler(grpcConn grpc.ClientConnInterface) ProjectHandler {
 	return &handler{projectClient: project.NewProjectServiceClient(grpcConn)}
+}
+
+//RegisterEndpoints registers the endpoints of our API for the project subdomain
+func RegisterEndpoints(r chi.Router, grpcConn grpc.ClientConnInterface) {
+
+	projectHandler := newProjectHandler(grpcConn)
+	r.Route("/projects", func(r chi.Router) {
+
+		r.Get("/", projectHandler.GetProjectsAll)
+		r.Get("/byid/{id}", projectHandler.GetProjectById)
+		r.Get("/byuser/{userid}", projectHandler.GetProjectsByUser)
+
+		r.Post("/", projectHandler.CreateProject)
+		r.Delete("/", projectHandler.DeleteProject)
+
+		//issue subroutes
+		r.Route("/issues", func(r chi.Router) {
+			r.Post("/", projectHandler.AddIssue)
+			r.Delete("/", projectHandler.RemoveIssue)
+		})
+
+		//user subroutes
+		r.Route("/users", func(r chi.Router) {
+			r.Post("/", projectHandler.AddUser)
+			r.Delete("/", projectHandler.RemoveUser)
+		})
+
+	})
+
 }
 
 func (h *handler) GetProjectsAll(w http.ResponseWriter, r *http.Request) {

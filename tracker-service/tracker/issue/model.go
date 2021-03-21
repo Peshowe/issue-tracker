@@ -7,7 +7,7 @@ type Issue struct {
 	Name string `bson:"name,omitempty" validate:"gte=2 & lte=40"`
 
 	//Description (can be empty and shouldn't be more than 500 chars)
-	Desc string `bson:"desc,omitempty" validate:"emtpy=true & lte=500"`
+	Desc string `bson:"desc,omitempty" validate:"lte=500"`
 
 	//Type of the issue (can be one of "bug", "feature" or "adhoc")
 	IssueType string `bson:"issue_type,omitempty" validate:"one_of=bug,feature,adhoc"`
