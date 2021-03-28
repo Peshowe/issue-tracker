@@ -2,8 +2,8 @@ package project
 
 import (
 	"encoding/json"
+	"github.com/Peshowe/issue-tracker/gateway/grpc-contract/tracker-service/v1/project"
 	"github.com/Peshowe/issue-tracker/gateway/utils"
-	"github.com/Peshowe/issue-tracker/grpc-contract/tracker-service/v1/project"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"

@@ -1,0 +1,28 @@
+version: '3'
+services:
+  gateway-service:
+    image: gateway-service
+    restart: unless-stopped
+    ports:
+      - "80:8000"
+      # - "443:443"
+    depends_on: 
+      - tracker-service
+  tracker-service:
+    image: tracker-service
+    restart: unless-stopped
+    # ports:
+    #   - "80:4040"
+      # - "443:443"
+    depends_on: 
+      - mongo
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    # ports:
+    #   - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+volumes:
+  mongodata:

@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	repo, err := mongo.NewMongoRepository("mongodb://localhost:27017/test-mongo", "test-mongo", 5)
+	repo, err := mongo.NewMongoRepository("mongodb://mongo:27017/test-mongo", "test-mongo", 5)
 	if err != nil {
 		fmt.Println(err)
 	}

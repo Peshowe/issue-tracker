@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"github.com/Peshowe/issue-tracker/grpc-contract/tracker-service/v1/issue"
+	"github.com/Peshowe/issue-tracker/tracker-service/grpc-contract/tracker-service/v1/issue"
 	is "github.com/Peshowe/issue-tracker/tracker-service/tracker/issue"
 )
 

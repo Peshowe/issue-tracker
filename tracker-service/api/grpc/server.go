@@ -5,8 +5,8 @@ import (
 	"google.golang.org/grpc/reflection"
 	"net"
 
-	"github.com/Peshowe/issue-tracker/grpc-contract/tracker-service/v1/issue"
-	"github.com/Peshowe/issue-tracker/grpc-contract/tracker-service/v1/project"
+	"github.com/Peshowe/issue-tracker/tracker-service/grpc-contract/tracker-service/v1/issue"
+	"github.com/Peshowe/issue-tracker/tracker-service/grpc-contract/tracker-service/v1/project"
 
 	is "github.com/Peshowe/issue-tracker/tracker-service/tracker/issue"
 	pr "github.com/Peshowe/issue-tracker/tracker-service/tracker/project"
