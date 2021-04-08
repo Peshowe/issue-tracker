@@ -3,89 +3,136 @@
 import logo from './logo.svg';
 import './App.css';
 
+
+import ToggleMenu from './ToggleMenu/ToggleMenu'
+
 import Draggable from 'react-draggable';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import styled from "styled-components";
 
-import Project from './Project/Project'
+// import {
+//   ContentContainer,
+//   MainContainer,
+// } from '@tmc/clr-react';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
-class App extends React.Component {
 
-  render() {
-    return (
-      <Project></Project>
-    )
-  }
+import ProjectExplorer from './Project/ProjectExplorer';
+import Project from './Project/Project';
 
-  // state = {
-  //   activeDrags: 0,
-  //   deltaPosition: {
-  //     x: 0, y: 0
-  //   },
-  //   controlledPosition: {
-  //     x: -400, y: 200
-  //   }
-  // };
+import { ModalProvider, BaseModalBackground } from "styled-react-modal";
 
-  // handleDrag = (e, ui) => {
-  //   const { x, y } = this.state.deltaPosition;
-  //   this.setState({
-  //     deltaPosition: {
-  //       x: x + ui.deltaX,
-  //       y: y + ui.deltaY,
-  //     }
-  //   });
-  // };
+const FadingBackground = styled(BaseModalBackground)`
+  opacity: ${(props) => props.opacity};
+  transition: all 0.3s ease-in-out;
+`;
 
-  // onStart = () => {
-  //   this.setState({ activeDrags: ++this.state.activeDrags });
-  // };
+const App = () => {
 
-  // onStop = () => {
-  //   this.setState({ activeDrags: --this.state.activeDrags });
-  // };
-  // onDrop = (e) => {
-  //   this.setState({ activeDrags: --this.state.activeDrags });
-  //   if (e.target.classList.contains("drop-target")) {
-  //     alert("Dropped!");
-  //     e.target.classList.remove('hovered');
-  //   }
-  // };
-  // onDropAreaMouseEnter = (e) => {
-  //   if (this.state.activeDrags) {
-  //     e.target.classList.add('hovered');
-  //   }
-  // }
-  // onDropAreaMouseLeave = (e) => {
-  //   e.target.classList.remove('hovered');
-  // }
+  return (
 
-  // render() {
-  //   const dragHandlers = { onStart: this.onStart, onStop: this.onStop };
-  //   return (
-  //     <div className="App">
-  //       <header className="App-header">
+    // <MainContainer>
 
-  //         <img src={logo} className="App-logo" alt="logo" />
+    // <ContentContainer>
+    <div>
+      <ModalProvider backgroundComponent={FadingBackground}>
+        <ToggleMenu />
+        <BrowserRouter>
+          <Switch>
+            <Route path="/projects/:projectId" component={Project} />
 
-  //         <Draggable {...dragHandlers}>
-  //           <div className="box">I can be dragged anywhere</div>
-  //         </Draggable>
+            <Route path="/">
+              <ProjectExplorer />
+            </Route>
 
-  //         <p>
-  //           Edit <code>src/App.js</code> and save to reload.
-  //       </p>
-  //         <a
-  //           className="App-link"
-  //           href="https://reactjs.org"
-  //           target="_blank"
-  //           rel="noopener noreferrer"
-  //         >
-  //           Learn React
-  //       </a>
-  //       </header>
-  //     </div>
-  //   );
-  // }
+          </Switch>
+        </BrowserRouter>
+      </ModalProvider>
+    </div>
+    // </ContentContainer>
+    // </MainContainer>
+
+  )
 }
+
+// class App extends React.Component {
+
+//   render() {
+//     return (
+//       <Project></Project>
+//     )
+//   }
+
+// state = {
+//   activeDrags: 0,
+//   deltaPosition: {
+//     x: 0, y: 0
+//   },
+//   controlledPosition: {
+//     x: -400, y: 200
+//   }
+// };
+
+// handleDrag = (e, ui) => {
+//   const { x, y } = this.state.deltaPosition;
+//   this.setState({
+//     deltaPosition: {
+//       x: x + ui.deltaX,
+//       y: y + ui.deltaY,
+//     }
+//   });
+// };
+
+// onStart = () => {
+//   this.setState({ activeDrags: ++this.state.activeDrags });
+// };
+
+// onStop = () => {
+//   this.setState({ activeDrags: --this.state.activeDrags });
+// };
+// onDrop = (e) => {
+//   this.setState({ activeDrags: --this.state.activeDrags });
+//   if (e.target.classList.contains("drop-target")) {
+//     alert("Dropped!");
+//     e.target.classList.remove('hovered');
+//   }
+// };
+// onDropAreaMouseEnter = (e) => {
+//   if (this.state.activeDrags) {
+//     e.target.classList.add('hovered');
+//   }
+// }
+// onDropAreaMouseLeave = (e) => {
+//   e.target.classList.remove('hovered');
+// }
+
+// render() {
+//   const dragHandlers = { onStart: this.onStart, onStop: this.onStop };
+//   return (
+//     <div className="App">
+//       <header className="App-header">
+
+//         <img src={logo} className="App-logo" alt="logo" />
+
+//         <Draggable {...dragHandlers}>
+//           <div className="box">I can be dragged anywhere</div>
+//         </Draggable>
+
+//         <p>
+//           Edit <code>src/App.js</code> and save to reload.
+//       </p>
+//         <a
+//           className="App-link"
+//           href="https://reactjs.org"
+//           target="_blank"
+//           rel="noopener noreferrer"
+//         >
+//           Learn React
+//       </a>
+//       </header>
+//     </div>
+//   );
+// }
+// }
 
 export default App;

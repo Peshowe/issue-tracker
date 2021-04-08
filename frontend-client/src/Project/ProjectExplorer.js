@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import LoadSpinner from '../LoadSpinner';
 
-import CreateIssueModal from '../Issue/CreateIssue';
+import CreateProjectModal from './CreateProject'
 
-function Project(props) {
+import { Link } from 'react-router-dom';
+
+
+
+
+
+function ProjectExplorer() {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [project, setProject] = useState([]);
+    const [projects, setProjects] = useState([]);
 
     // Note: the empty deps array [] means 
     // this useEffect will run once
     // similar to componentDidMount()
     useEffect(() => {
-        fetch(`/v1/projects/byid/${props.match.params.projectId}`)
+        fetch("/v1/projects")
             .then(res => res.json())
             .then(
                 (result) => {
                     setIsLoaded(true);
-                    setProject(result);
-                    console.log(result);
+                    setProjects(result.projects);
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -37,19 +42,21 @@ function Project(props) {
     } else {
         return (
             <div>
-                {project.name}
-                <CreateIssueModal projectId={project.id} />
+
+                <CreateProjectModal />
+                <ul>
+                    {projects.map(item => (
+                        <li key={item.id}>
+                            <Link to={`/projects/${item.id}`} className="btn btn-primary">{item.name}</Link>
+                            {/* <button onClick="test" variant="contained">{item.name} {item.created_on}</button> */}
+                        </li>
+                    ))}
+                    <LoadSpinner />
+                </ul>
             </div>
-            // <ul>
-            //     {project.map(item => (
-            //         <li key={item.id}>
-            //             <button variant="contained">{item.name} {item.created_on}</button>
-            //         </li>
-            //     ))}
-            //     <LoadSpinner/>
-            // </ul>
         );
     }
 }
 
-export default Project
+
+export default ProjectExplorer;
