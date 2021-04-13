@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import LoadSpinner from '../LoadSpinner';
-
-import CreateIssueModal from '../Issue/CreateIssue';
 import IssuesBoard from '../Issue/IssuesBoard'
 
 function Project(props) {

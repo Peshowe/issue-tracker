@@ -4,65 +4,42 @@ import LoadSpinner from '../LoadSpinner';
 import CreateIssueModal from './CreateIssue';
 
 function IssuesBoard(props) {
-    const [activeDrags, setActiveDrags] = useState(0);
-    const [deltaPosition, setDeltaPosition] = useState({ x: 0, y: 0 });
-    const [controlledPosition, setControlledPosition] = useState({ x: -400, y: 200 });
-
-    const statusCols = ["todo_col", "inprogress_col", "done_col"]
-
-    const handleDrag = (e, ui) => {
-        const { x, y } = this.state.deltaPosition;
-        setDeltaPosition({
-            x: x + ui.deltaX,
-            y: y + ui.deltaY
-        });
-    };
-
-    const onStart = () => {
-        setActiveDrags(activeDrags + 1);
-    };
-
-    const onStop = (e, position) => {
-        setActiveDrags(activeDrags - 1);
-
-        //check in which column we've dragged the issue
-        for (let col of statusCols) {
-            let bounds = document.getElementById(col).getBoundingClientRect();
-
-            if (position.x > bounds.left && position.x < bounds.right) {
-                console.log("In " + col)
-                break;
-            }
-
-        }
-
-        //TODO: reset if not in a known column or in same column
-        position.x = position.lastX
-        position.y = position.lastY
-
-    };
-
-    const onDrop = (e) => {
-        setActiveDrags(activeDrags - 1);
-        if (e.target.classList.contains("drop-target")) {
-            alert("Dropped!");
-            e.target.classList.remove('hovered');
-        }
-    };
-
-    const onDropAreaMouseEnter = (e) => {
-        if (activeDrags) {
-            e.target.classList.add('hovered');
-        }
-    }
-
-    const onDropAreaMouseLeave = (e) => {
-        e.target.classList.remove('hovered');
-    }
 
     const [error, setError] = useState(null);
     const [issuesLoaded, setIssuesLoaded] = useState(false);
     const [issues, setIssues] = useState([]);
+
+    const statusCols = ["todo_col", "inprogress_col", "done_col"];
+    const statusVals = ["to do", "in progress", "done"];
+
+
+    function onStop(e, position, issue) {
+
+        //check in which column we've dragged the issue
+        let i;
+        for (i = 0; i < statusCols.length; i++) {
+            let bounds = document.getElementById(statusCols[i]).getBoundingClientRect();
+
+            if (position.x > bounds.left && position.x < bounds.right) {
+                console.log("In " + statusVals[i]);
+
+                if (issue.status == statusVals[i]) {
+                    //TODO: reset if not in a known column or in same column
+                    // position.x = position.lastX
+                    // position.y = position.lastY
+                    console.log("no change");
+                } else {
+                    issue.status = statusVals[i];
+
+                }
+                break;
+            }
+
+        }
+        console.log(issue);
+    };
+
+
 
     function fetchIssues() {
         fetch(`/v1/issues/byproject/${props.projectId}`)
@@ -86,10 +63,9 @@ function IssuesBoard(props) {
     }
 
     function createDraggableIssues(issues) {
-        const dragHandlers = { onStart: onStart, onStop: onStop };
         const draggableIssues = []
         for (const [index, value] of issues.entries()) {
-            draggableIssues.push(<Draggable bounds="#board" grid={[50, 50]} {...dragHandlers}><li key={index}>{value.name}</li></Draggable>);
+            draggableIssues.push(<Draggable bounds="#board" grid={[50, 50]} onStop={(e, position) => onStop(e, position, value)} ><li key={index}>{value.name}</li></Draggable>);
         }
 
         return draggableIssues;
