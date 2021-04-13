@@ -2,13 +2,14 @@ package issue
 
 import (
 	"encoding/json"
-	"github.com/Peshowe/issue-tracker/gateway/grpc-contract/tracker-service/v1/issue"
-	"github.com/Peshowe/issue-tracker/gateway/utils"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/Peshowe/issue-tracker/gateway-service/grpc-contract/tracker-service/v1/issue"
+	"github.com/Peshowe/issue-tracker/gateway-service/utils"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-	"io/ioutil"
-	"net/http"
 )
 
 type IssueHandler interface {
@@ -41,8 +42,8 @@ func RegisterEndpoints(r chi.Router, grpcConn grpc.ClientConnInterface) {
 	r.Route("/issues", func(r chi.Router) {
 
 		r.Get("/byid/{id}", issueHandler.GetIssueById)
-		r.Get("/byproject/{projectid}", issueHandler.GetIssuesByProject)
-		r.Get("/byuser/{userid}", issueHandler.GetIssuesByUser)
+		r.Get("/byproject/{projectId}", issueHandler.GetIssuesByProject)
+		r.Get("/byuser/{userId}", issueHandler.GetIssuesByUser)
 
 		r.Post("/", issueHandler.CreateIssue)
 		r.Delete("/", issueHandler.DeleteIssue)

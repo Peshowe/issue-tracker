@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/Peshowe/issue-tracker/tracker-service/api/grpc"
 	"github.com/Peshowe/issue-tracker/tracker-service/repository/mongo"
 	"github.com/Peshowe/issue-tracker/tracker-service/tracker/issue"
@@ -9,7 +11,11 @@ import (
 )
 
 func main() {
-	repo, err := mongo.NewMongoRepository("mongodb://mongo:27017/test-mongo", "test-mongo", 5)
+	mongoAddress := "mongodb://mongo:27017/test-mongo"
+	if os.Getenv("MONGO_ADDRESS") != "" {
+		mongoAddress = os.Getenv("MONGO_ADDRESS")
+	}
+	repo, err := mongo.NewMongoRepository(mongoAddress, "test-mongo", 5)
 	if err != nil {
 		fmt.Println(err)
 	}

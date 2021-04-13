@@ -2,17 +2,26 @@ package main
 
 import (
 	"fmt"
-	"github.com/Peshowe/issue-tracker/gateway/tracker-proxy/issue"
-	"github.com/Peshowe/issue-tracker/gateway/tracker-proxy/project"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"google.golang.org/grpc"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/issue"
+	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/project"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"google.golang.org/grpc"
 )
+
+// jsonContentTypeMiddleware is middleware used to set the content type of all responses to application/json
+func jsonContentTypeMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
+}
 
 func main() {
 	conn, err := grpc.Dial("tracker-service:4040", grpc.WithInsecure())
@@ -32,7 +41,7 @@ func main() {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/v1", func(r chi.Router) {
-
+		r.Use(jsonContentTypeMiddleware)
 		project.RegisterEndpoints(r, conn)
 		issue.RegisterEndpoints(r, conn)
 	})

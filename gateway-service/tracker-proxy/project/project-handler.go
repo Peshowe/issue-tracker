@@ -2,13 +2,15 @@ package project
 
 import (
 	"encoding/json"
-	"github.com/Peshowe/issue-tracker/gateway/grpc-contract/tracker-service/v1/project"
-	"github.com/Peshowe/issue-tracker/gateway/utils"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/Peshowe/issue-tracker/gateway-service/grpc-contract/tracker-service/v1/project"
+	// "github.com/Peshowe/issue-tracker/gateway-service/grpc-contract/tracker-service/v1/issue"
+	"github.com/Peshowe/issue-tracker/gateway-service/utils"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-	"io/ioutil"
-	"net/http"
 )
 
 type ProjectHandler interface {
@@ -33,10 +35,15 @@ type ProjectHandler interface {
 type handler struct {
 	//the gRPC client
 	projectClient project.ProjectServiceClient
+	//one for the issue subdomain as well, since we'll be doing some API composition
+	// issueClient issue.IssueServiceClient
 }
 
 func newProjectHandler(grpcConn grpc.ClientConnInterface) ProjectHandler {
-	return &handler{projectClient: project.NewProjectServiceClient(grpcConn)}
+	return &handler{
+		projectClient: project.NewProjectServiceClient(grpcConn),
+		// issueClient: issue.NewIssueServiceClient(grpcConn),
+	}
 }
 
 //RegisterEndpoints registers the endpoints of our API for the project subdomain
@@ -47,7 +54,7 @@ func RegisterEndpoints(r chi.Router, grpcConn grpc.ClientConnInterface) {
 
 		r.Get("/", projectHandler.GetProjectsAll)
 		r.Get("/byid/{id}", projectHandler.GetProjectById)
-		r.Get("/byuser/{userid}", projectHandler.GetProjectsByUser)
+		r.Get("/byuser/{userId}", projectHandler.GetProjectsByUser)
 
 		r.Post("/", projectHandler.CreateProject)
 		r.Delete("/", projectHandler.DeleteProject)
@@ -87,6 +94,11 @@ func (h *handler) GetProjectById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//TODO: Do API composition here and fetch the Issues this project has (or should I be doing it here?)
+	// resp.Issues
+	// issuesResp, err := h.issueClient.GetIssuesByProject(r.Context(), &issue.IssuesByProjectRequest{ProjectId: id})
+
+	// resp.Issues = issuesResp
 	json.NewEncoder(w).Encode(resp)
 
 }

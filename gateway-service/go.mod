@@ -1,4 +1,4 @@
-module github.com/Peshowe/issue-tracker/gateway
+module github.com/Peshowe/issue-tracker/gateway-service
 
 go 1.15
 

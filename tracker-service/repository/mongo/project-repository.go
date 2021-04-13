@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/Peshowe/issue-tracker/tracker-service/tracker/project"
+	
 )
 
 //getProjectsCollection gets a reference to the projects collection in the db
@@ -74,12 +75,12 @@ func (r *mongoRepository) GetProjectsByUser(userId string) ([]*project.Project, 
 	collection := r.getProjectsCollection()
 
 	//construct the filter
-	idPrimitive, err := primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return nil, errors.Wrap(err, "repository.Project.GetProjectsByUser")
-	}
+	// idPrimitive, err := primitive.ObjectIDFromHex(userId)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "repository.Project.GetProjectsByUser")
+	// }
 	filter := bson.D{
-		{"users", bson.D{{"$all", bson.A{idPrimitive}}}},
+		{"users", bson.D{{"$all", bson.A{userId}}}},
 	}
 
 	//query the db
@@ -154,13 +155,13 @@ func (r *mongoRepository) AddIssue(projectId string, issueId string) error {
 	filter := bson.M{"_id": idPrimitive}
 
 	//construct the update statement
-	idPrimitive, err = primitive.ObjectIDFromHex(issueId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Project.AddIssue")
-	}
+	// idPrimitive, err = primitive.ObjectIDFromHex(issueId)
+	// if err != nil {
+	// 	return errors.Wrap(err, "repository.Project.AddIssue")
+	// }
 	update := bson.D{
 		//we'll use addToSet here, although push should work just as well
-		{"$addToSet", bson.D{{"issues", idPrimitive}}},
+		{"$addToSet", bson.D{{"issues", issueId}}},
 	}
 
 	//update the db

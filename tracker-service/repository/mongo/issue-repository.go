@@ -79,11 +79,11 @@ func (r *mongoRepository) GetIssuesByProject(projectId string) ([]*issue.Issue, 
 	collection := r.getIssuesCollection()
 
 	//construct the filter
-	idPrimitive, err := primitive.ObjectIDFromHex(projectId)
-	if err != nil {
-		return nil, errors.Wrap(err, "repository.Issue.GetIssuesByProject")
-	}
-	filter := bson.M{"project": idPrimitive}
+	// idPrimitive, err := primitive.ObjectIDFromHex(projectId)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "repository.Issue.GetIssuesByProject")
+	// }
+	filter := bson.M{"project": projectId}
 
 	//query the db
 	cur, err := collection.Find(ctx, filter)
@@ -111,11 +111,11 @@ func (r *mongoRepository) GetIssuesByUser(userId string) ([]*issue.Issue, error)
 	collection := r.getIssuesCollection()
 
 	//construct the filter
-	idPrimitive, err := primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return nil, errors.Wrap(err, "repository.Issue.GetIssuesByUser")
-	}
-	filter := bson.M{"user": idPrimitive}
+	// idPrimitive, err := primitive.ObjectIDFromHex(userId)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "repository.Issue.GetIssuesByUser")
+	// }
+	filter := bson.M{"user": userId}
 
 	//query the db
 	cur, err := collection.Find(ctx, filter)
@@ -144,6 +144,12 @@ func (r *mongoRepository) CreateIssue(issueStrut *issue.Issue) error {
 	if err != nil {
 		return errors.Wrap(err, "repository.Issue.CreateIssue")
 	}
+
+	// //Add the Id of the created Issue to the referenced project
+	// if err = r.AddIssue(issueStrut.Project, res.InsertedID.(primitive.ObjectID).Hex()); err != nil {
+	// 	return errors.Wrap(err, "repository.Issue.CreateIssue")
+	// }
+
 	return nil
 }
 

@@ -385,5 +385,5 @@ var IssueService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "issue.proto",
+	Metadata: "grpc-contract/tracker-service/v1/issue/issue.proto",
 }
