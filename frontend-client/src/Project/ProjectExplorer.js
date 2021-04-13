@@ -17,7 +17,7 @@ function ProjectExplorer() {
     // Note: the empty deps array [] means 
     // this useEffect will run once
     // similar to componentDidMount()
-    useEffect(() => {
+    function fetchProjects() {
         fetch("/v1/projects")
             .then(res => res.json())
             .then(
@@ -33,6 +33,9 @@ function ProjectExplorer() {
                     setError(error);
                 }
             )
+    }
+    useEffect(() => {
+        fetchProjects()
     }, [])
 
     if (error) {
@@ -43,7 +46,7 @@ function ProjectExplorer() {
         return (
             <div>
 
-                <CreateProjectModal />
+                <CreateProjectModal onCreate={fetchProjects} />
                 <ul>
                     {projects.map(item => (
                         <li key={item.id}>
@@ -51,7 +54,6 @@ function ProjectExplorer() {
                             {/* <button onClick="test" variant="contained">{item.name} {item.created_on}</button> */}
                         </li>
                     ))}
-                    <LoadSpinner />
                 </ul>
             </div>
         );

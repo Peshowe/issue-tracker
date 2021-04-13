@@ -13,7 +13,7 @@ const StyledModal = Modal.styled`
   opacity: ${(props) => props.opacity};
   transition : all 0.3s ease-in-out;`;
 
-function CreateProjectModal() {
+function CreateProjectModal(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [opacity, setOpacity] = useState(0);
     const [projectName, setProjectName] = useState("")
@@ -57,9 +57,11 @@ function CreateProjectModal() {
             // .then(res => res.json)
             .then(
                 (result) => {
-                    setIsSubmitting(false)
+                    setIsSubmitting(false);
                     //close the modal
                     setIsOpen(false);
+                    props.onCreate();
+
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow

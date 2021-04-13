@@ -69,6 +69,7 @@ function CreateIssueModal(props) {
                     setIsSubmitting(false)
                     //close the modal
                     setIsOpen(false);
+                    props.onCreate();
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
