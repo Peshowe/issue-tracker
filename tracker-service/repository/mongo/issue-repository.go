@@ -283,7 +283,7 @@ func (r *mongoRepository) UpdateUser(issueId string, userId string) error {
 	//construct the update statement
 	idPrimitive, err = primitive.ObjectIDFromHex(userId)
 	if err != nil {
-		return errors.Wrap(err, "repository.Project.RemoveUser")
+		return errors.Wrap(err, "repository.Issue.UpdateUser")
 	}
 	update := bson.D{
 		{"$set", bson.D{{"user", idPrimitive}}},
@@ -295,7 +295,37 @@ func (r *mongoRepository) UpdateUser(issueId string, userId string) error {
 		if err == mongo.ErrNoDocuments {
 			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.UpdateUser")
 		}
-		return errors.Wrap(err, "repository.Issue.UpdateStatus")
+		return errors.Wrap(err, "repository.Issue.UpdateUser")
+	}
+	return nil
+}
+
+func (r *mongoRepository) UpdateLastModifiedOn(issueId string, time int64) error {
+	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
+	defer cancel()
+
+	//get the collection
+	collection := r.getIssuesCollection()
+
+	//construct the filter (to identify the issue to update)
+	idPrimitive, err := primitive.ObjectIDFromHex(issueId)
+	if err != nil {
+		return errors.Wrap(err, "repository.Issue.UpdateLastModifiedOn")
+	}
+	filter := bson.M{"_id": idPrimitive}
+
+	//construct the update statement
+	update := bson.D{
+		{"$set", bson.D{{"last_modified_on", time}}},
+	}
+
+	//update the db
+	_, err = collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.UpdateLastModifiedOn")
+		}
+		return errors.Wrap(err, "repository.Issue.UpdateLastModifiedOn")
 	}
 	return nil
 }

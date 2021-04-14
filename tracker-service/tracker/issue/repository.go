@@ -12,4 +12,5 @@ type IssueRepository interface {
 	UpdateDescription(issueId string, newDescription string) error
 	UpdateBugTrace(issueId string, newBugTrace string) error
 	UpdateUser(issueId string, userId string) error
+	UpdateLastModifiedOn(string, int64) error
 }

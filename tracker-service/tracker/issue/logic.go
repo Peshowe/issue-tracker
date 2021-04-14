@@ -2,9 +2,10 @@ package issue
 
 import (
 	"errors"
+	"time"
+
 	errs "github.com/pkg/errors"
 	"gopkg.in/dealancer/validate.v2"
-	"time"
 )
 
 // predefine some very general errors (could be more specific like having different errors for Project, Issue, User)
@@ -55,17 +56,34 @@ func (r *issueService) DeleteIssue(id string) error {
 }
 
 func (r *issueService) UpdateStatus(issueId string, newStatus string) error {
+	if err := r.updateLastModifiedOn(issueId); err != nil {
+		return err
+	}
 	return r.issueRepo.UpdateStatus(issueId, newStatus)
 }
 
 func (r *issueService) UpdateUser(issueId string, userId string) error {
+	if err := r.updateLastModifiedOn(issueId); err != nil {
+		return err
+	}
 	return r.issueRepo.UpdateUser(issueId, userId)
 }
 
 func (r *issueService) UpdateDescription(issueId string, newDescription string) error {
+	if err := r.updateLastModifiedOn(issueId); err != nil {
+		return err
+	}
 	return r.issueRepo.UpdateDescription(issueId, newDescription)
 }
 
 func (r *issueService) UpdateBugTrace(issueId string, newBugTrace string) error {
+	if err := r.updateLastModifiedOn(issueId); err != nil {
+		return err
+	}
 	return r.issueRepo.UpdateBugTrace(issueId, newBugTrace)
+}
+
+func (r *issueService) updateLastModifiedOn(issueId string) error {
+	currentTime := time.Now().UTC().Unix()
+	return r.issueRepo.UpdateLastModifiedOn(issueId, currentTime)
 }
