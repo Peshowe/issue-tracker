@@ -37,28 +37,12 @@ message CreateRequest {
     IssueResponse issue = 1;
 }
 
+message PutRequest {
+    IssueResponse issue = 1;
+}
+
 message DeleteRequest {
     string id = 1;
-}
-
-message UpdateStatusRequest {
-    string issueId = 1;
-    string newStatus = 2;
-}
-
-message UpdateUserRequest {
-    string issueId = 1;
-    string userId = 2;
-}
-
-message UpdateDescriptionRequest {
-    string issueId = 1;
-    string newDescription = 2;
-}
-
-message UpdateBugTraceRequest {
-    string issueId = 1;
-    string newBugTrace = 2;
 }
 
 message GenericResponse{} // empty message
@@ -69,11 +53,6 @@ service IssueService {
     rpc GetIssuesByUser(IssuesByUserRequest) returns (IssuesResponse);
 
     rpc CreateIssue(CreateRequest) returns (GenericResponse);
+    rpc PutIssue(PutRequest) returns (GenericResponse);
     rpc DeleteIssue(DeleteRequest) returns (GenericResponse);
-
-    rpc UpdateStatus(UpdateStatusRequest) returns (GenericResponse);
-    rpc UpdateUser(UpdateUserRequest) returns (GenericResponse);
-
-    rpc UpdateDescription(UpdateDescriptionRequest) returns (GenericResponse);
-    rpc UpdateBugTrace(UpdateBugTraceRequest) returns (GenericResponse);
 }

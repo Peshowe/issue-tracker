@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/Peshowe/issue-tracker/tracker-service/grpc-contract/tracker-service/v1/project"
 	pr "github.com/Peshowe/issue-tracker/tracker-service/tracker/project"
 )
@@ -15,9 +16,9 @@ type projectServer struct {
 //encodeProject converts a *pr.Project type to a *project.ProjectResponse
 func encodeProject(p *pr.Project) *project.ProjectResponse {
 	return &project.ProjectResponse{
-		Id:        p.Id,
-		Name:      p.Name,
-		Issues:    p.Issues,
+		Id:   p.Id,
+		Name: p.Name,
+		// Issues:    p.Issues,
 		Users:     p.Users,
 		CreatedOn: p.CreatedOn,
 	}
@@ -86,26 +87,6 @@ func (s *projectServer) CreateProject(ctx context.Context, request *project.Crea
 func (s *projectServer) DeleteProject(ctx context.Context, request *project.DeleteRequest) (*project.GenericResponse, error) {
 	projectId := request.GetId()
 	err := s.projectService.DeleteProject(projectId)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &project.GenericResponse{}, nil
-}
-
-func (s *projectServer) AddIssue(ctx context.Context, request *project.IssueRequest) (*project.GenericResponse, error) {
-	err := s.projectService.AddIssue(request.GetProjectId(), request.GetIssueId())
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &project.GenericResponse{}, nil
-}
-
-func (s *projectServer) RemoveIssue(ctx context.Context, request *project.IssueRequest) (*project.GenericResponse, error) {
-	err := s.projectService.RemoveIssue(request.GetProjectId(), request.GetIssueId())
 
 	if err != nil {
 		return nil, err

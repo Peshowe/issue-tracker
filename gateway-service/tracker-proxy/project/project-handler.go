@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/Peshowe/issue-tracker/gateway-service/grpc-contract/tracker-service/v1/project"
-	// "github.com/Peshowe/issue-tracker/gateway-service/grpc-contract/tracker-service/v1/issue"
 	"github.com/Peshowe/issue-tracker/gateway-service/utils"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
@@ -21,11 +20,6 @@ type ProjectHandler interface {
 	CreateProject(http.ResponseWriter, *http.Request)
 	DeleteProject(http.ResponseWriter, *http.Request)
 
-	//AddIssue adds an issue to the given project
-	AddIssue(http.ResponseWriter, *http.Request)
-	//RemoveIssue removes an issue from the given project
-	RemoveIssue(http.ResponseWriter, *http.Request)
-
 	//AddUser adds a user to the given project
 	AddUser(http.ResponseWriter, *http.Request)
 	//RemoveUser removes a user from the given project
@@ -35,14 +29,11 @@ type ProjectHandler interface {
 type handler struct {
 	//the gRPC client
 	projectClient project.ProjectServiceClient
-	//one for the issue subdomain as well, since we'll be doing some API composition
-	// issueClient issue.IssueServiceClient
 }
 
 func newProjectHandler(grpcConn grpc.ClientConnInterface) ProjectHandler {
 	return &handler{
 		projectClient: project.NewProjectServiceClient(grpcConn),
-		// issueClient: issue.NewIssueServiceClient(grpcConn),
 	}
 }
 
@@ -58,12 +49,6 @@ func RegisterEndpoints(r chi.Router, grpcConn grpc.ClientConnInterface) {
 
 		r.Post("/", projectHandler.CreateProject)
 		r.Delete("/", projectHandler.DeleteProject)
-
-		//issue subroutes
-		r.Route("/issues", func(r chi.Router) {
-			r.Post("/", projectHandler.AddIssue)
-			r.Delete("/", projectHandler.RemoveIssue)
-		})
 
 		//user subroutes
 		r.Route("/users", func(r chi.Router) {
@@ -94,11 +79,6 @@ func (h *handler) GetProjectById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//TODO: Do API composition here and fetch the Issues this project has (or should I be doing it here?)
-	// resp.Issues
-	// issuesResp, err := h.issueClient.GetIssuesByProject(r.Context(), &issue.IssuesByProjectRequest{ProjectId: id})
-
-	// resp.Issues = issuesResp
 	json.NewEncoder(w).Encode(resp)
 
 }
@@ -156,56 +136,6 @@ func (h *handler) DeleteProject(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.projectClient.DeleteProject(r.Context(), req)
 	if err != nil {
 		utils.HandleError(errors.Wrap(err, "projectHandler.DeleteProject"), w)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-
-	json.NewEncoder(w).Encode(resp)
-
-}
-
-func (h *handler) AddIssue(w http.ResponseWriter, r *http.Request) {
-
-	requestBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		utils.HandleError(err, w)
-		return
-	}
-
-	req := &project.IssueRequest{}
-	if err := json.Unmarshal(requestBody, req); err != nil {
-		utils.HandleError(errors.Wrap(err, "projectHandler.AddIssue"), w)
-		return
-	}
-	resp, err := h.projectClient.AddIssue(r.Context(), req)
-	if err != nil {
-		utils.HandleError(errors.Wrap(err, "projectHandler.AddIssue"), w)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-
-	json.NewEncoder(w).Encode(resp)
-
-}
-
-func (h *handler) RemoveIssue(w http.ResponseWriter, r *http.Request) {
-
-	requestBody, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		utils.HandleError(err, w)
-		return
-	}
-
-	req := &project.IssueRequest{}
-	if err := json.Unmarshal(requestBody, req); err != nil {
-		utils.HandleError(errors.Wrap(err, "projectHandler.RemoveIssue"), w)
-		return
-	}
-	resp, err := h.projectClient.RemoveIssue(r.Context(), req)
-	if err != nil {
-		utils.HandleError(errors.Wrap(err, "projectHandler.RemoveIssue"), w)
 		return
 	}
 

@@ -2,9 +2,10 @@ package project
 
 import (
 	"errors"
+	"time"
+
 	errs "github.com/pkg/errors"
 	"gopkg.in/dealancer/validate.v2"
-	"time"
 )
 
 // predefine some general errors
@@ -61,14 +62,6 @@ func (r *projectService) DeleteProject(id string) error {
 // 	}
 // 	return r.projectRepo.UpdateProject(project)
 // }
-
-func (r *projectService) AddIssue(projectId string, issueId string) error {
-	return r.projectRepo.AddIssue(projectId, issueId)
-}
-
-func (r *projectService) RemoveIssue(projectId string, issueId string) error {
-	return r.projectRepo.RemoveIssue(projectId, issueId)
-}
 
 func (r *projectService) AddUser(projectId string, userId string) error {
 	return r.projectRepo.AddUser(projectId, userId)

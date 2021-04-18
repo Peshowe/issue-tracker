@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/Peshowe/issue-tracker/tracker-service/tracker/project"
-	
 )
 
 //getProjectsCollection gets a reference to the projects collection in the db
@@ -135,77 +134,6 @@ func (r *mongoRepository) DeleteProject(id string) error {
 			return errors.Wrap(project.ErrProjectNotFound, "repository.Project.DeleteProject")
 		}
 		return errors.Wrap(err, "repository.Project.DeleteProject")
-	}
-	return nil
-}
-
-//AddIssue adds an issue to the given project
-func (r *mongoRepository) AddIssue(projectId string, issueId string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
-	//get the collection
-	collection := r.getProjectsCollection()
-
-	//construct the filter (to identify the project to update)
-	idPrimitive, err := primitive.ObjectIDFromHex(projectId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Project.AddIssue")
-	}
-	filter := bson.M{"_id": idPrimitive}
-
-	//construct the update statement
-	// idPrimitive, err = primitive.ObjectIDFromHex(issueId)
-	// if err != nil {
-	// 	return errors.Wrap(err, "repository.Project.AddIssue")
-	// }
-	update := bson.D{
-		//we'll use addToSet here, although push should work just as well
-		{"$addToSet", bson.D{{"issues", issueId}}},
-	}
-
-	//update the db
-	_, err = collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return errors.Wrap(project.ErrProjectNotFound, "repository.Project.UpdateOne")
-		}
-		return errors.Wrap(err, "repository.Project.AddIssue")
-	}
-	return nil
-}
-
-//RemoveIssue removes an issue from the given project
-func (r *mongoRepository) RemoveIssue(projectId string, issueId string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
-	//get the collection
-	collection := r.getProjectsCollection()
-
-	//construct the filter (to identify the project to update)
-	idPrimitive, err := primitive.ObjectIDFromHex(projectId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Project.RemoveIssue")
-	}
-	filter := bson.M{"_id": idPrimitive}
-
-	//construct the update statement
-	idPrimitive, err = primitive.ObjectIDFromHex(issueId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Project.RemoveIssue")
-	}
-	update := bson.D{
-		{"$pull", bson.D{{"issues", idPrimitive}}},
-	}
-
-	//update the db
-	_, err = collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return errors.Wrap(project.ErrProjectNotFound, "repository.Project.RemoveIssue")
-		}
-		return errors.Wrap(err, "repository.Project.RemoveIssue")
 	}
 	return nil
 }

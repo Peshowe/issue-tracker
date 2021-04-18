@@ -8,9 +8,9 @@ type ProjectRepository interface {
 	DeleteProject(id string) error
 
 	//AddIssue adds an issue to the given project
-	AddIssue(projectId string, issueId string) error
+	// AddIssue(projectId string, issueId string) error
 	//RemoveIssue removes an issue from the given project
-	RemoveIssue(projectId string, issueId string) error
+	// RemoveIssue(projectId string, issueId string) error
 
 	//AddUser adds a user to the given project
 	AddUser(projectId string, userId string) error

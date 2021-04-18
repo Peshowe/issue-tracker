@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import LoadSpinner from '../LoadSpinner';
-import CreateIssueModal from './CreateIssue';
+import IssueModal from './IssueModal';
 
 function IssuesBoard(props) {
 
     const [error, setError] = useState(null);
     const [issuesLoaded, setIssuesLoaded] = useState(false);
-    // const [issues, setIssues] = useState([]);
 
+    //arrays where the issues will be stored depending on their statuses
     const [toDo, setToDo] = useState([]);
     const [inProgress, setInProgress] = useState([]);
     const [done, setDone] = useState([]);
@@ -17,6 +17,7 @@ function IssuesBoard(props) {
     const statusVals = ["to do", "in progress", "done"];
 
 
+    //pop the given issue from its current status array
     function popIssue(issue) {
         if (issue.status == "to do") {
             setToDo(toDo.filter(is => is.id != issue.id));
@@ -27,6 +28,7 @@ function IssuesBoard(props) {
         }
     }
 
+    //push the given issue into a status array based on its current status
     function pushIssue(issue) {
 
         if (issue.status == "to do") {
@@ -38,33 +40,54 @@ function IssuesBoard(props) {
         }
     }
 
+    function postIssue(issue) {
+        return fetch('/v1/issues', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                issue: {
+                    name: issue.name,
+                    desc: issue.desc,
+                    issue_type: issue.issue_type,
+                    bug_trace: issue.bug_trace,
+                    status: "to do",
+                    project: props.projectId
+                }
 
-    function putStatus(issue, status) {
+            })
+        })
+    }
 
-        setIssuesLoaded(false)
-        fetch('/v1/issues/status', {
+    function putIssue(issue) {
+        console.log(issue)
+        return fetch('/v1/issues', {
             method: 'PUT',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                issueId: issue.id,
-                newStatus: status
+                issue: issue
 
             })
         })
-            // .then(res => res.json)
+    }
+
+    function putStatus(issue, status) {
+        popIssue(issue);
+        issue.status = status;
+        pushIssue(issue);
+
+        setIssuesLoaded(false);
+        putIssue(issue)
             .then(
                 (result) => {
-                    popIssue(issue);
-                    issue.status = status;
-                    pushIssue(issue);
+
                     setIssuesLoaded(true);
                 },
-                // Note: it's important to handle errors here
-                // instead of a catch() block so that we don't swallow
-                // exceptions from actual bugs in components.
                 (error) => {
                     setIssuesLoaded(true);
                     setError(error);
@@ -73,23 +96,23 @@ function IssuesBoard(props) {
     }
 
 
-    function onStop(e, position, issue) {
-
+    //handler when we stop dragging an issue
+    function onStop(e, issue) {
         //check in which column we've dragged the issue
+        e.stopPropagation(); //stop other handlers from triggering
         let i;
         for (i = 0; i < statusCols.length; i++) {
+
             let bounds = document.getElementById(statusCols[i]).getBoundingClientRect();
 
-            if (position.x > bounds.left && position.x < bounds.right) {
+            if ((e.clientX > bounds.left) && (e.clientX < bounds.right)) {
                 console.log("In " + statusVals[i]);
-                console.log(position)
-                console.log(bounds)
 
+                // putStatus(issue, statusVals[i]);
 
                 if (issue.status == statusVals[i]) {
                     //TODO: reset if not in a known column or in same column
-                    // position.x = position.lastX
-                    // position.y = position.lastY
+                    setToDo(toDo);
                     console.log("no change");
                 } else {
                     // issue.status = statusVals[i];
@@ -129,10 +152,14 @@ function IssuesBoard(props) {
             )
     }
 
+    function showUpdateModal() {
+        return <IssueModal />
+    }
+
     function createDraggableIssues(issues) {
         const draggableIssues = []
         for (const [index, value] of issues.entries()) {
-            draggableIssues.push(<li key={value.id}><Draggable bounds="#board" grid={[50, 50]} onStop={(e, position) => onStop(e, position, value)} ><button>{value.name}</button></Draggable></li>);
+            draggableIssues.push(<Draggable bounds="#board" onStop={(e) => onStop(e, value)} ><div><IssueModal issue={value} onSubmit={putIssue} /></div></Draggable>);
         }
 
         return draggableIssues;
@@ -155,7 +182,7 @@ function IssuesBoard(props) {
         return (
             <div>
 
-                <CreateIssueModal projectId={props.projectId} onCreate={fetchIssues} />
+                <IssueModal projectId={props.projectId} onSubmit={postIssue} issue={null} onCreate={fetchIssues} />
 
                     Hello
 

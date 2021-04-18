@@ -4,7 +4,7 @@ body{
 }
 
 .column {
-  float: left;
+  /* float: left; */
   width: 33.33%;
   border: 5px solid red;
 }

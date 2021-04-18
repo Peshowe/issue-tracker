@@ -51,39 +51,23 @@ func (r *issueService) CreateIssue(issue *Issue) error {
 	return r.issueRepo.CreateIssue(issue)
 }
 
+func (r *issueService) PutIssue(issue *Issue) error {
+
+	if err := validate.Validate(issue); err != nil {
+		return errs.Wrap(ErrIssueInvalid, "service.Issue.PutIssue")
+	}
+
+	//update timestamp
+	currentTime := time.Now().UTC().Unix()
+	issue.LastModifiedOn = currentTime
+
+	if err := r.issueRepo.PutIssue(issue); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *issueService) DeleteIssue(id string) error {
 	return r.issueRepo.DeleteIssue(id)
-}
-
-func (r *issueService) UpdateStatus(issueId string, newStatus string) error {
-	if err := r.updateLastModifiedOn(issueId); err != nil {
-		return err
-	}
-	return r.issueRepo.UpdateStatus(issueId, newStatus)
-}
-
-func (r *issueService) UpdateUser(issueId string, userId string) error {
-	if err := r.updateLastModifiedOn(issueId); err != nil {
-		return err
-	}
-	return r.issueRepo.UpdateUser(issueId, userId)
-}
-
-func (r *issueService) UpdateDescription(issueId string, newDescription string) error {
-	if err := r.updateLastModifiedOn(issueId); err != nil {
-		return err
-	}
-	return r.issueRepo.UpdateDescription(issueId, newDescription)
-}
-
-func (r *issueService) UpdateBugTrace(issueId string, newBugTrace string) error {
-	if err := r.updateLastModifiedOn(issueId); err != nil {
-		return err
-	}
-	return r.issueRepo.UpdateBugTrace(issueId, newBugTrace)
-}
-
-func (r *issueService) updateLastModifiedOn(issueId string) error {
-	currentTime := time.Now().UTC().Unix()
-	return r.issueRepo.UpdateLastModifiedOn(issueId, currentTime)
 }

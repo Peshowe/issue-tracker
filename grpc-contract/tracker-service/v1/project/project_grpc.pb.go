@@ -23,8 +23,6 @@ type ProjectServiceClient interface {
 	GetProjectsByUser(ctx context.Context, in *ProjectsByUserRequest, opts ...grpc.CallOption) (*ProjectsResponse, error)
 	CreateProject(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*GenericResponse, error)
 	DeleteProject(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*GenericResponse, error)
-	AddIssue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*GenericResponse, error)
-	RemoveIssue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*GenericResponse, error)
 	AddUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*GenericResponse, error)
 	RemoveUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*GenericResponse, error)
 }
@@ -82,24 +80,6 @@ func (c *projectServiceClient) DeleteProject(ctx context.Context, in *DeleteRequ
 	return out, nil
 }
 
-func (c *projectServiceClient) AddIssue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
-	out := new(GenericResponse)
-	err := c.cc.Invoke(ctx, "/project.ProjectService/AddIssue", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *projectServiceClient) RemoveIssue(ctx context.Context, in *IssueRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
-	out := new(GenericResponse)
-	err := c.cc.Invoke(ctx, "/project.ProjectService/RemoveIssue", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *projectServiceClient) AddUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
 	out := new(GenericResponse)
 	err := c.cc.Invoke(ctx, "/project.ProjectService/AddUser", in, out, opts...)
@@ -127,8 +107,6 @@ type ProjectServiceServer interface {
 	GetProjectsByUser(context.Context, *ProjectsByUserRequest) (*ProjectsResponse, error)
 	CreateProject(context.Context, *CreateRequest) (*GenericResponse, error)
 	DeleteProject(context.Context, *DeleteRequest) (*GenericResponse, error)
-	AddIssue(context.Context, *IssueRequest) (*GenericResponse, error)
-	RemoveIssue(context.Context, *IssueRequest) (*GenericResponse, error)
 	AddUser(context.Context, *UserRequest) (*GenericResponse, error)
 	RemoveUser(context.Context, *UserRequest) (*GenericResponse, error)
 	mustEmbedUnimplementedProjectServiceServer()
@@ -152,12 +130,6 @@ func (UnimplementedProjectServiceServer) CreateProject(context.Context, *CreateR
 }
 func (UnimplementedProjectServiceServer) DeleteProject(context.Context, *DeleteRequest) (*GenericResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProject not implemented")
-}
-func (UnimplementedProjectServiceServer) AddIssue(context.Context, *IssueRequest) (*GenericResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddIssue not implemented")
-}
-func (UnimplementedProjectServiceServer) RemoveIssue(context.Context, *IssueRequest) (*GenericResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RemoveIssue not implemented")
 }
 func (UnimplementedProjectServiceServer) AddUser(context.Context, *UserRequest) (*GenericResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddUser not implemented")
@@ -268,42 +240,6 @@ func _ProjectService_DeleteProject_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProjectService_AddIssue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IssueRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProjectServiceServer).AddIssue(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/project.ProjectService/AddIssue",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServiceServer).AddIssue(ctx, req.(*IssueRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ProjectService_RemoveIssue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IssueRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProjectServiceServer).RemoveIssue(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/project.ProjectService/RemoveIssue",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServiceServer).RemoveIssue(ctx, req.(*IssueRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ProjectService_AddUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserRequest)
 	if err := dec(in); err != nil {
@@ -366,14 +302,6 @@ var ProjectService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteProject",
 			Handler:    _ProjectService_DeleteProject_Handler,
-		},
-		{
-			MethodName: "AddIssue",
-			Handler:    _ProjectService_AddIssue_Handler,
-		},
-		{
-			MethodName: "RemoveIssue",
-			Handler:    _ProjectService_RemoveIssue_Handler,
 		},
 		{
 			MethodName: "AddUser",

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+
 	"github.com/Peshowe/issue-tracker/tracker-service/grpc-contract/tracker-service/v1/issue"
 	is "github.com/Peshowe/issue-tracker/tracker-service/tracker/issue"
 )
@@ -25,6 +26,20 @@ func encodeIssue(i *is.Issue) *issue.IssueResponse {
 		Project:        i.Project,
 		CreatedOn:      i.CreatedOn,
 		LastModifiedOn: i.LastModifiedOn,
+	}
+}
+
+//decodeIssue converts a *issue.IssueResponse type to a *is.Issue
+func decodeIssue(i *issue.IssueResponse) *is.Issue {
+	return &is.Issue{
+		Id:        i.Id,
+		Name:      i.Name,
+		Desc:      i.Desc,
+		IssueType: i.IssueType,
+		Status:    i.Status,
+		BugTrace:  i.BugTrace,
+		User:      i.User,
+		Project:   i.Project,
 	}
 }
 
@@ -77,17 +92,19 @@ func (s *issueServer) GetIssuesByUser(ctx context.Context, request *issue.Issues
 }
 
 func (s *issueServer) CreateIssue(ctx context.Context, request *issue.CreateRequest) (*issue.GenericResponse, error) {
-	i := request.GetIssue()
-	issueStruct := &is.Issue{
-		Name:      i.Name,
-		Desc:      i.Desc,
-		IssueType: i.IssueType,
-		Status:    i.Status,
-		BugTrace:  i.BugTrace,
-		User:      i.User,
-		Project:   i.Project,
-	}
+	issueStruct := decodeIssue(request.GetIssue())
 	err := s.issueService.CreateIssue(issueStruct)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &issue.GenericResponse{}, nil
+}
+
+func (s *issueServer) PutIssue(ctx context.Context, request *issue.PutRequest) (*issue.GenericResponse, error) {
+	issueStruct := decodeIssue(request.GetIssue())
+	err := s.issueService.PutIssue(issueStruct)
 
 	if err != nil {
 		return nil, err
@@ -99,46 +116,6 @@ func (s *issueServer) CreateIssue(ctx context.Context, request *issue.CreateRequ
 func (s *issueServer) DeleteIssue(ctx context.Context, request *issue.DeleteRequest) (*issue.GenericResponse, error) {
 	projectId := request.GetId()
 	err := s.issueService.DeleteIssue(projectId)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &issue.GenericResponse{}, nil
-}
-
-func (s *issueServer) UpdateStatus(ctx context.Context, request *issue.UpdateStatusRequest) (*issue.GenericResponse, error) {
-	err := s.issueService.UpdateStatus(request.GetIssueId(), request.GetNewStatus())
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &issue.GenericResponse{}, nil
-}
-
-func (s *issueServer) UpdateUser(ctx context.Context, request *issue.UpdateUserRequest) (*issue.GenericResponse, error) {
-	err := s.issueService.UpdateUser(request.GetIssueId(), request.GetUserId())
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &issue.GenericResponse{}, nil
-}
-
-func (s *issueServer) UpdateDescription(ctx context.Context, request *issue.UpdateDescriptionRequest) (*issue.GenericResponse, error) {
-	err := s.issueService.UpdateDescription(request.GetIssueId(), request.GetNewDescription())
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &issue.GenericResponse{}, nil
-}
-
-func (s *issueServer) UpdateBugTrace(ctx context.Context, request *issue.UpdateBugTraceRequest) (*issue.GenericResponse, error) {
-	err := s.issueService.UpdateBugTrace(request.GetIssueId(), request.GetNewBugTrace())
 
 	if err != nil {
 		return nil, err

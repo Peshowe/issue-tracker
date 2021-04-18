@@ -145,11 +145,35 @@ func (r *mongoRepository) CreateIssue(issueStrut *issue.Issue) error {
 		return errors.Wrap(err, "repository.Issue.CreateIssue")
 	}
 
-	// //Add the Id of the created Issue to the referenced project
-	// if err = r.AddIssue(issueStrut.Project, res.InsertedID.(primitive.ObjectID).Hex()); err != nil {
-	// 	return errors.Wrap(err, "repository.Issue.CreateIssue")
-	// }
+	return nil
+}
 
+//PutIssue updates an existing issue (completely replaces it)
+func (r *mongoRepository) PutIssue(issueStrut *issue.Issue) error {
+	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
+	defer cancel()
+
+	//get the collection
+	collection := r.getIssuesCollection()
+
+	//construct the filter (to identify the issue to update)
+	idPrimitive, err := primitive.ObjectIDFromHex(issueStrut.Id)
+	if err != nil {
+		return errors.Wrap(err, "repository.Issue.PutIssue")
+	}
+	filter := bson.M{"_id": idPrimitive}
+
+	//don't include the Id in the object
+	issueStrut.Id = ""
+
+	//update the db
+	_, err = collection.ReplaceOne(ctx, filter, issueStrut)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.PutIssue")
+		}
+		return errors.Wrap(err, "repository.Issue.PutIssue")
+	}
 	return nil
 }
 
@@ -172,160 +196,6 @@ func (r *mongoRepository) DeleteIssue(id string) error {
 	_, err = collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return errors.Wrap(err, "repository.Issue.DeleteIssue")
-	}
-	return nil
-}
-
-func (r *mongoRepository) UpdateStatus(issueId string, newStatus string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
-	//get the collection
-	collection := r.getIssuesCollection()
-
-	//construct the filter (to identify the issue to update)
-	idPrimitive, err := primitive.ObjectIDFromHex(issueId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Issue.UpdateStatus")
-	}
-	filter := bson.M{"_id": idPrimitive}
-
-	//construct the update statement
-	update := bson.D{
-		{"$set", bson.D{{"status", newStatus}}},
-	}
-
-	//update the db
-	_, err = collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.UpdateStatus")
-		}
-		return errors.Wrap(err, "repository.Issue.UpdateStatus")
-	}
-	return nil
-}
-
-func (r *mongoRepository) UpdateDescription(issueId string, newDescription string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
-	//get the collection
-	collection := r.getIssuesCollection()
-
-	//construct the filter (to identify the issue to update)
-	idPrimitive, err := primitive.ObjectIDFromHex(issueId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Issue.UpdateDescription")
-	}
-	filter := bson.M{"_id": idPrimitive}
-
-	//construct the update statement
-	update := bson.D{
-		{"$set", bson.D{{"description", newDescription}}},
-	}
-
-	//update the db
-	_, err = collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.UpdateDescription")
-		}
-		return errors.Wrap(err, "repository.Issue.UpdateDescription")
-	}
-	return nil
-}
-
-func (r *mongoRepository) UpdateBugTrace(issueId string, newBugTrace string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
-	//get the collection
-	collection := r.getIssuesCollection()
-
-	//construct the filter (to identify the issue to update)
-	idPrimitive, err := primitive.ObjectIDFromHex(issueId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Issue.UpdateDescription")
-	}
-	filter := bson.M{"_id": idPrimitive}
-
-	//construct the update statement
-	update := bson.D{
-		{"$set", bson.D{{"bug_trace", newBugTrace}}},
-	}
-
-	//update the db
-	_, err = collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.UpdateBugTrace")
-		}
-		return errors.Wrap(err, "repository.Issue.UpdateDescription")
-	}
-	return nil
-}
-
-func (r *mongoRepository) UpdateUser(issueId string, userId string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
-	//get the collection
-	collection := r.getIssuesCollection()
-
-	//construct the filter (to identify the issue to update)
-	idPrimitive, err := primitive.ObjectIDFromHex(issueId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Issue.UpdateStatus")
-	}
-	filter := bson.M{"_id": idPrimitive}
-
-	//construct the update statement
-	idPrimitive, err = primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Issue.UpdateUser")
-	}
-	update := bson.D{
-		{"$set", bson.D{{"user", idPrimitive}}},
-	}
-
-	//update the db
-	_, err = collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.UpdateUser")
-		}
-		return errors.Wrap(err, "repository.Issue.UpdateUser")
-	}
-	return nil
-}
-
-func (r *mongoRepository) UpdateLastModifiedOn(issueId string, time int64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
-	//get the collection
-	collection := r.getIssuesCollection()
-
-	//construct the filter (to identify the issue to update)
-	idPrimitive, err := primitive.ObjectIDFromHex(issueId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Issue.UpdateLastModifiedOn")
-	}
-	filter := bson.M{"_id": idPrimitive}
-
-	//construct the update statement
-	update := bson.D{
-		{"$set", bson.D{{"last_modified_on", time}}},
-	}
-
-	//update the db
-	_, err = collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.UpdateLastModifiedOn")
-		}
-		return errors.Wrap(err, "repository.Issue.UpdateLastModifiedOn")
 	}
 	return nil
 }

@@ -22,11 +22,8 @@ type IssueServiceClient interface {
 	GetIssuesByProject(ctx context.Context, in *IssuesByProjectRequest, opts ...grpc.CallOption) (*IssuesResponse, error)
 	GetIssuesByUser(ctx context.Context, in *IssuesByUserRequest, opts ...grpc.CallOption) (*IssuesResponse, error)
 	CreateIssue(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*GenericResponse, error)
+	PutIssue(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*GenericResponse, error)
 	DeleteIssue(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*GenericResponse, error)
-	UpdateStatus(ctx context.Context, in *UpdateStatusRequest, opts ...grpc.CallOption) (*GenericResponse, error)
-	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*GenericResponse, error)
-	UpdateDescription(ctx context.Context, in *UpdateDescriptionRequest, opts ...grpc.CallOption) (*GenericResponse, error)
-	UpdateBugTrace(ctx context.Context, in *UpdateBugTraceRequest, opts ...grpc.CallOption) (*GenericResponse, error)
 }
 
 type issueServiceClient struct {
@@ -73,45 +70,18 @@ func (c *issueServiceClient) CreateIssue(ctx context.Context, in *CreateRequest,
 	return out, nil
 }
 
+func (c *issueServiceClient) PutIssue(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
+	out := new(GenericResponse)
+	err := c.cc.Invoke(ctx, "/issue.IssueService/PutIssue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *issueServiceClient) DeleteIssue(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
 	out := new(GenericResponse)
 	err := c.cc.Invoke(ctx, "/issue.IssueService/DeleteIssue", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *issueServiceClient) UpdateStatus(ctx context.Context, in *UpdateStatusRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
-	out := new(GenericResponse)
-	err := c.cc.Invoke(ctx, "/issue.IssueService/UpdateStatus", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *issueServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
-	out := new(GenericResponse)
-	err := c.cc.Invoke(ctx, "/issue.IssueService/UpdateUser", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *issueServiceClient) UpdateDescription(ctx context.Context, in *UpdateDescriptionRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
-	out := new(GenericResponse)
-	err := c.cc.Invoke(ctx, "/issue.IssueService/UpdateDescription", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *issueServiceClient) UpdateBugTrace(ctx context.Context, in *UpdateBugTraceRequest, opts ...grpc.CallOption) (*GenericResponse, error) {
-	out := new(GenericResponse)
-	err := c.cc.Invoke(ctx, "/issue.IssueService/UpdateBugTrace", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,11 +96,8 @@ type IssueServiceServer interface {
 	GetIssuesByProject(context.Context, *IssuesByProjectRequest) (*IssuesResponse, error)
 	GetIssuesByUser(context.Context, *IssuesByUserRequest) (*IssuesResponse, error)
 	CreateIssue(context.Context, *CreateRequest) (*GenericResponse, error)
+	PutIssue(context.Context, *PutRequest) (*GenericResponse, error)
 	DeleteIssue(context.Context, *DeleteRequest) (*GenericResponse, error)
-	UpdateStatus(context.Context, *UpdateStatusRequest) (*GenericResponse, error)
-	UpdateUser(context.Context, *UpdateUserRequest) (*GenericResponse, error)
-	UpdateDescription(context.Context, *UpdateDescriptionRequest) (*GenericResponse, error)
-	UpdateBugTrace(context.Context, *UpdateBugTraceRequest) (*GenericResponse, error)
 	mustEmbedUnimplementedIssueServiceServer()
 }
 
@@ -150,20 +117,11 @@ func (UnimplementedIssueServiceServer) GetIssuesByUser(context.Context, *IssuesB
 func (UnimplementedIssueServiceServer) CreateIssue(context.Context, *CreateRequest) (*GenericResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateIssue not implemented")
 }
+func (UnimplementedIssueServiceServer) PutIssue(context.Context, *PutRequest) (*GenericResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutIssue not implemented")
+}
 func (UnimplementedIssueServiceServer) DeleteIssue(context.Context, *DeleteRequest) (*GenericResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteIssue not implemented")
-}
-func (UnimplementedIssueServiceServer) UpdateStatus(context.Context, *UpdateStatusRequest) (*GenericResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateStatus not implemented")
-}
-func (UnimplementedIssueServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*GenericResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
-}
-func (UnimplementedIssueServiceServer) UpdateDescription(context.Context, *UpdateDescriptionRequest) (*GenericResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateDescription not implemented")
-}
-func (UnimplementedIssueServiceServer) UpdateBugTrace(context.Context, *UpdateBugTraceRequest) (*GenericResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateBugTrace not implemented")
 }
 func (UnimplementedIssueServiceServer) mustEmbedUnimplementedIssueServiceServer() {}
 
@@ -250,6 +208,24 @@ func _IssueService_CreateIssue_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IssueService_PutIssue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IssueServiceServer).PutIssue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/issue.IssueService/PutIssue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IssueServiceServer).PutIssue(ctx, req.(*PutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _IssueService_DeleteIssue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteRequest)
 	if err := dec(in); err != nil {
@@ -264,78 +240,6 @@ func _IssueService_DeleteIssue_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IssueServiceServer).DeleteIssue(ctx, req.(*DeleteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IssueService_UpdateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IssueServiceServer).UpdateStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/issue.IssueService/UpdateStatus",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IssueServiceServer).UpdateStatus(ctx, req.(*UpdateStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IssueService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IssueServiceServer).UpdateUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/issue.IssueService/UpdateUser",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IssueServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IssueService_UpdateDescription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateDescriptionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IssueServiceServer).UpdateDescription(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/issue.IssueService/UpdateDescription",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IssueServiceServer).UpdateDescription(ctx, req.(*UpdateDescriptionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IssueService_UpdateBugTrace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateBugTraceRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IssueServiceServer).UpdateBugTrace(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/issue.IssueService/UpdateBugTrace",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IssueServiceServer).UpdateBugTrace(ctx, req.(*UpdateBugTraceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -364,24 +268,12 @@ var IssueService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _IssueService_CreateIssue_Handler,
 		},
 		{
+			MethodName: "PutIssue",
+			Handler:    _IssueService_PutIssue_Handler,
+		},
+		{
 			MethodName: "DeleteIssue",
 			Handler:    _IssueService_DeleteIssue_Handler,
-		},
-		{
-			MethodName: "UpdateStatus",
-			Handler:    _IssueService_UpdateStatus_Handler,
-		},
-		{
-			MethodName: "UpdateUser",
-			Handler:    _IssueService_UpdateUser_Handler,
-		},
-		{
-			MethodName: "UpdateDescription",
-			Handler:    _IssueService_UpdateDescription_Handler,
-		},
-		{
-			MethodName: "UpdateBugTrace",
-			Handler:    _IssueService_UpdateBugTrace_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
