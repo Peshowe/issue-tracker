@@ -152,14 +152,10 @@ function IssuesBoard(props) {
             )
     }
 
-    function showUpdateModal() {
-        return <IssueModal />
-    }
-
     function createDraggableIssues(issues) {
         const draggableIssues = []
         for (const [index, value] of issues.entries()) {
-            draggableIssues.push(<Draggable bounds="#board" onStop={(e) => onStop(e, value)} ><div><IssueModal issue={value} onSubmit={putIssue} /></div></Draggable>);
+            draggableIssues.push(<Draggable bounds="#board" onDrag={(e) => onStop(e, value)} ><div><IssueModal issue={value} onSubmit={putIssue} onDone={() => ""} /></div></Draggable>);
         }
 
         return draggableIssues;
@@ -182,7 +178,7 @@ function IssuesBoard(props) {
         return (
             <div>
 
-                <IssueModal projectId={props.projectId} onSubmit={postIssue} issue={null} onCreate={fetchIssues} />
+                <IssueModal projectId={props.projectId} onSubmit={postIssue} issue={null} onDone={fetchIssues} />
 
                     Hello
 
