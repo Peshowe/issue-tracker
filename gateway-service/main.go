@@ -8,6 +8,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Peshowe/issue-tracker/gateway-service/authentication"
+	"github.com/Peshowe/issue-tracker/gateway-service/frontend"
 	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/issue"
 	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/project"
 	"github.com/Peshowe/issue-tracker/gateway-service/utils"
@@ -33,16 +35,29 @@ func main() {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	authentication.LoginRedirect = frontend.LoginRedirect
+	authentication.AddAuthExceptionPath("/login")
+
+	// register the authentication endpoints
+	authentication.RegisterEndpoints(r)
+
+	// register the business logic API endpoints
 	r.Route("/v1", func(r chi.Router) {
+		// r.Use(authentication.AuthenticationMiddleware)
 		r.Use(utils.JsonContentTypeMiddleware)
 		project.RegisterEndpoints(r, conn)
 		issue.RegisterEndpoints(r, conn)
 	})
 
+	r.Route("/", func(r chi.Router) {
+		frontend.RegisterEndpoints(r, authentication.AuthenticationMiddleware)
+	})
+
 	errs := make(chan error, 2)
 	go func() {
-		fmt.Println("Listening on port :8000")
-		errs <- http.ListenAndServe(httpPort(), r)
+		port := httpPort()
+		fmt.Println("Listening on port", port)
+		errs <- http.ListenAndServe(port, r)
 
 	}()
 
@@ -57,7 +72,7 @@ func main() {
 }
 
 func httpPort() string {
-	port := "8000"
+	port := "3000"
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
 	}
