@@ -47,14 +47,13 @@ function ProjectExplorer() {
             <div>
 
                 <CreateProjectModal onCreate={fetchProjects} />
-                <ul>
-                    {projects.map(item => (
-                        <li key={item.id}>
-                            <Link to={`/projects/${item.id}`} className="btn btn-primary">{item.name}</Link>
-                            {/* <button onClick="test" variant="contained">{item.name} {item.created_on}</button> */}
-                        </li>
-                    ))}
-                </ul>
+                {projects.map(item => (
+
+                    <div className="listItem"><Link to={`/projects/${item.id}`} className="btn btn-primary">{item.name}</Link></div>
+
+
+                ))}
+
             </div>
         );
     }

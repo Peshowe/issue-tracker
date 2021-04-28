@@ -41,23 +41,37 @@ function IssueForm(props) {
     }, [])
 
 
-    return (<div>
+    return (<div
+        style={{
+            // "height": "70%",
+            // "width": "70%"
+        }}
+    >
         <form>
-            <label>Name: </label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} />
+            <div>
+                <label>Name: </label>
+                <input type="text" value={name} onChange={e => setName(e.target.value)} />
 
-            <label>Description: </label>
-            <input type="text" value={description} onChange={e => setDescription(e.target.value)} />
+                <label>Issue type: </label>
+                <select value={issueType} onChange={e => setIssueType(e.target.value)}>
+                    <option value="bug">Bug</option>
+                    <option value="feature">Feature</option>
+                    <option value="adhoc">Ad Hoc</option>
+                </select>
+            </div>
 
-            <label>Issue type: </label>
-            <select value={issueType} onChange={e => setIssueType(e.target.value)}>
-                <option value="bug">Bug</option>
-                <option value="feature">Feature</option>
-                <option value="adhoc">Ad Hoc</option>
-            </select>
+            <div>
+                <label>Description: </label>
+                <br />
+                <textarea className="inputArea" value={description} onChange={e => setDescription(e.target.value)} />
 
-            <label>Bug trace: </label>
-            <textarea value={bugTrace} onChange={e => setBugTrace(e.target.value)} />
+
+            </div>
+            <div>
+                <label>Bug trace: </label>
+                <br />
+                <textarea className="inputArea" value={bugTrace} onChange={e => setBugTrace(e.target.value)} />
+            </div>
         </form>
 
         <button onClick={onClick} className="btn btn-primary">{props.buttonLabel}</button>

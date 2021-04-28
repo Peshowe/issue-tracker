@@ -6,7 +6,7 @@ body{
 .column {
   /* float: left; */
   width: 33.33%;
-  border: 5px solid red;
+  border: 5px solid rgb(150, 145, 145);
 }
 
 /* Clear floats after the columns */
@@ -14,6 +14,15 @@ body{
   content: "";
   display: table;
   clear: both;
+}
+
+.inputArea{
+  height: 100%;
+  width: 100%;
+}
+
+.listItem{
+  padding: 0.2em;
 }
 /* 
 .App {

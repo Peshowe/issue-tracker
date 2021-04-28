@@ -41,7 +41,10 @@ function Project(props) {
     } else {
         return (
             <div>
-                {project.name}
+                <h2 style={{
+                    "padding-top": "0.5em",
+                    "padding-left": "1em"
+                }}>{project.name}</h2>
                 <IssuesBoard projectId={project.id} />
             </div>
         );

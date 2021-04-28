@@ -155,7 +155,7 @@ function IssuesBoard(props) {
     function createDraggableIssues(issues) {
         const draggableIssues = []
         for (const [index, value] of issues.entries()) {
-            draggableIssues.push(<Draggable bounds="#board" onDrag={(e) => onStop(e, value)} ><div><IssueModal issue={value} onSubmit={putIssue} onDone={() => ""} /></div></Draggable>);
+            draggableIssues.push(<Draggable bounds="#board" onDrag={(e) => onStop(e, value)} ><div className="listItem"><IssueModal issue={value} onSubmit={putIssue} onDone={() => ""} /></div></Draggable>);
         }
 
         return draggableIssues;
@@ -176,12 +176,13 @@ function IssuesBoard(props) {
         const doneComponents = createDraggableIssues(done);
 
         return (
-            <div>
+            <div
+                style={
+                    { "padding": "1.5em" }
+                }>
 
                 <IssueModal projectId={props.projectId} onSubmit={postIssue} issue={null} onDone={fetchIssues} />
-
-                    Hello
-
+                <br />
                 <div id="board" className="row" style={{ position: 'relative', overflow: 'auto', padding: '0' }}>
                     <div id={statusCols[0]} className="column">
                         To Do
