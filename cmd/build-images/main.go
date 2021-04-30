@@ -2,13 +2,13 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/Peshowe/issue-tracker/cmd/utils"
 )
 
 var dockerCommand string = "docker"
@@ -27,43 +27,13 @@ func readArgs() []string {
 	return os.Args[1:]
 }
 
-//runCommand executes the dockerCommand with the provided args and tails the output
-func runCommand(args []string) {
-
-	cmd := exec.Command(dockerCommand, args...)
-	log.Println("Executing: ", cmd)
-
-	//create a pipe for the output of the script
-	cmdReader, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Fatal("Error creating StdoutPipe", err)
-	}
-
-	//tail the output of the command
-	scanner := bufio.NewScanner(cmdReader)
-	go func() {
-		for scanner.Scan() {
-			fmt.Printf("\t > %s\n", scanner.Text())
-		}
-	}()
-
-	//start and wait for the command to finish
-	if err := cmd.Start(); err != nil {
-		log.Fatal("Error starting command", err)
-	}
-
-	if err := cmd.Wait(); err != nil {
-		log.Fatal("Error waiting for command", err)
-	}
-}
-
 //buildImages build the images for the passed services
 func buildImages(services []string) {
 
 	for _, service := range services {
 		log.Println("Building: ", service)
 		args := strings.Split(fmt.Sprintf(dockerBuildArgs, service, service), " ")
-		runCommand(args)
+		utils.RunCommand(dockerCommand, args)
 	}
 
 }

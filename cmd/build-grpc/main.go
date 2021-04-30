@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/Peshowe/issue-tracker/cmd/utils"
 )
 
 //compileCommand is the command used for generating Golang code from the proto files
@@ -37,43 +38,14 @@ func compileProto() {
 	for _, proto := range protoPaths {
 		log.Println("Compiling: ", proto)
 		args := strings.Split(fmt.Sprintf(compileArgs, proto), " ")
-		cmd := exec.Command(compileCommand, args...)
-		err := cmd.Run()
-		if err != nil {
-			log.Fatal(err)
-		}
+		utils.RunCommand(compileCommand, args)
+		// cmd := exec.Command(compileCommand, args...)
+		// err := cmd.Run()
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 	}
 
-}
-
-//copyFile copies (more like links) the currently traversed file to the destination
-func copyFile(source, dest string) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
-		d := strings.Replace(path, source, dest, 1)
-		if info.IsDir() {
-			//if it's a dir, make a new dir
-			os.Mkdir(d, os.ModePerm)
-		} else {
-			//if it's not a dir, create a hard link
-			os.Link(path, d)
-		}
-
-		return nil
-	}
-}
-
-//copyDir copies (more like hard links) the contents of source into dest
-func copyDir(source, dest string) {
-
-	log.Printf("Copying contents of %s in %s", source, dest)
-
-	if err := os.RemoveAll(dest); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := filepath.Walk(source, copyFile(source, dest)); err != nil {
-		log.Fatal(err)
-	}
 }
 
 func main() {
@@ -86,7 +58,7 @@ func main() {
 
 	//copy the compiled files into the root of each service
 	for _, dest := range desinationtDirs {
-		copyDir(sourceDir, dest)
+		utils.CopyDir(sourceDir, dest)
 	}
 
 }
