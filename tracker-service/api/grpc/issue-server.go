@@ -54,7 +54,7 @@ func encodeIssues(i_slice []*is.Issue) []*issue.IssueResponse {
 
 func (s *issueServer) GetIssueById(ctx context.Context, request *issue.IssueByIdRequest) (*issue.IssueResponse, error) {
 	issueId := request.GetId()
-	issueResp, err := s.issueService.GetIssueById(issueId)
+	issueResp, err := s.issueService.GetIssueById(ctx, issueId)
 
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (s *issueServer) GetIssueById(ctx context.Context, request *issue.IssueById
 
 func (s *issueServer) GetIssuesByProject(ctx context.Context, request *issue.IssuesByProjectRequest) (*issue.IssuesResponse, error) {
 	projectId := request.GetProjectId()
-	issues, err := s.issueService.GetIssuesByProject(projectId)
+	issues, err := s.issueService.GetIssuesByProject(ctx, projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (s *issueServer) GetIssuesByProject(ctx context.Context, request *issue.Iss
 
 func (s *issueServer) GetIssuesByUser(ctx context.Context, request *issue.IssuesByUserRequest) (*issue.IssuesResponse, error) {
 	userId := request.GetUserId()
-	issues, err := s.issueService.GetIssuesByUser(userId)
+	issues, err := s.issueService.GetIssuesByUser(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (s *issueServer) GetIssuesByUser(ctx context.Context, request *issue.Issues
 
 func (s *issueServer) CreateIssue(ctx context.Context, request *issue.CreateRequest) (*issue.GenericResponse, error) {
 	issueStruct := decodeIssue(request.GetIssue())
-	err := s.issueService.CreateIssue(issueStruct)
+	err := s.issueService.CreateIssue(ctx, issueStruct)
 
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func (s *issueServer) CreateIssue(ctx context.Context, request *issue.CreateRequ
 
 func (s *issueServer) PutIssue(ctx context.Context, request *issue.PutRequest) (*issue.GenericResponse, error) {
 	issueStruct := decodeIssue(request.GetIssue())
-	err := s.issueService.PutIssue(issueStruct)
+	err := s.issueService.PutIssue(ctx, issueStruct)
 
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ func (s *issueServer) PutIssue(ctx context.Context, request *issue.PutRequest) (
 
 func (s *issueServer) DeleteIssue(ctx context.Context, request *issue.DeleteRequest) (*issue.GenericResponse, error) {
 	projectId := request.GetId()
-	err := s.issueService.DeleteIssue(projectId)
+	err := s.issueService.DeleteIssue(ctx, projectId)
 
 	if err != nil {
 		return nil, err

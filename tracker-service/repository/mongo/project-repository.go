@@ -17,10 +17,7 @@ func (r *mongoRepository) getProjectsCollection() *mongo.Collection {
 }
 
 //GetProjectsAll returns all projects in the database
-func (r *mongoRepository) GetProjectsAll() ([]*project.Project, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) GetProjectsAll(ctx context.Context) ([]*project.Project, error) {
 	//get the collection
 	collection := r.getProjectsCollection()
 
@@ -39,10 +36,7 @@ func (r *mongoRepository) GetProjectsAll() ([]*project.Project, error) {
 }
 
 //GetProjectById returns a single project that matches the given id
-func (r *mongoRepository) GetProjectById(id string) (*project.Project, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) GetProjectById(ctx context.Context, id string) (*project.Project, error) {
 	//get the collection
 	collection := r.getProjectsCollection()
 
@@ -66,10 +60,7 @@ func (r *mongoRepository) GetProjectById(id string) (*project.Project, error) {
 }
 
 //GetProjectsByUser returns all projects in which the given user is present
-func (r *mongoRepository) GetProjectsByUser(userId string) ([]*project.Project, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) GetProjectsByUser(ctx context.Context, userId string) ([]*project.Project, error) {
 	//get the collection
 	collection := r.getProjectsCollection()
 
@@ -97,10 +88,7 @@ func (r *mongoRepository) GetProjectsByUser(userId string) ([]*project.Project, 
 }
 
 //CreateProject adds a new project to the database
-func (r *mongoRepository) CreateProject(projectStrut *project.Project) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) CreateProject(ctx context.Context, projectStrut *project.Project) error {
 	//get the collection
 	collection := r.getProjectsCollection()
 
@@ -113,10 +101,7 @@ func (r *mongoRepository) CreateProject(projectStrut *project.Project) error {
 }
 
 //DeleteProject removes a project from the database
-func (r *mongoRepository) DeleteProject(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) DeleteProject(ctx context.Context, id string) error {
 	//get the collection
 	collection := r.getProjectsCollection()
 
@@ -139,10 +124,7 @@ func (r *mongoRepository) DeleteProject(id string) error {
 }
 
 //AddUser adds a user to the given project
-func (r *mongoRepository) AddUser(projectId string, userId string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) AddUser(ctx context.Context, projectId string, userId string) error {
 	//get the collection
 	collection := r.getProjectsCollection()
 
@@ -175,10 +157,7 @@ func (r *mongoRepository) AddUser(projectId string, userId string) error {
 }
 
 //RemoveUser removes a user from the given project
-func (r *mongoRepository) RemoveUser(projectId string, userId string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) RemoveUser(ctx context.Context, projectId string, userId string) error {
 	//get the collection
 	collection := r.getProjectsCollection()
 

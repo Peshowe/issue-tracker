@@ -21,7 +21,7 @@ func main() {
 	}
 
 	projectService := project.NewProjectService(repo)
-	issueService := issue.NewIssueService(repo)
+	issueService := issue.NewIssueService(repo, projectService)
 
 	grpc.StartServer(projectService, issueService)
 

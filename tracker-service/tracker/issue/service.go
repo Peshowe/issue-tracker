@@ -1,10 +1,12 @@
 package issue
 
+import "context"
+
 type IssueService interface {
-	GetIssueById(id string) (*Issue, error)
-	GetIssuesByProject(projectId string) ([]*Issue, error)
-	GetIssuesByUser(userId string) ([]*Issue, error)
-	CreateIssue(issue *Issue) error
-	PutIssue(issue *Issue) error
-	DeleteIssue(id string) error
+	GetIssueById(ctx context.Context, id string) (*Issue, error)
+	GetIssuesByProject(ctx context.Context, projectId string) ([]*Issue, error)
+	GetIssuesByUser(ctx context.Context, userId string) ([]*Issue, error)
+	CreateIssue(ctx context.Context, issue *Issue) error
+	PutIssue(ctx context.Context, issue *Issue) error
+	DeleteIssue(ctx context.Context, id string) error
 }

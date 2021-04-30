@@ -1,9 +1,12 @@
 package issue
 
 import (
+	"context"
 	"errors"
 	"time"
 
+	"github.com/Peshowe/issue-tracker/tracker-service/tracker/project"
+	"github.com/Peshowe/issue-tracker/tracker-service/utils"
 	errs "github.com/pkg/errors"
 	"gopkg.in/dealancer/validate.v2"
 )
@@ -17,57 +20,90 @@ var (
 type issueService struct {
 	//reference to our repository (i.e. database)
 	issueRepo IssueRepository
+	//we need a reference to the project service to deal with authorization (this is not ideal)
+	projectService project.ProjectService
 }
 
-func NewIssueService(issueRepo IssueRepository) IssueService {
+func NewIssueService(issueRepo IssueRepository, projectService project.ProjectService) IssueService {
 	return &issueService{
 		issueRepo,
+		projectService,
 	}
 }
 
 //Issue logic
 
-func (r *issueService) GetIssueById(id string) (*Issue, error) {
-	return r.issueRepo.GetIssueById(id)
+//userAllowed returns whether a user can perform an action on given issue
+func (r *issueService) userAllowed(ctx context.Context, issueId string) bool {
+	project, _ := r.issueRepo.GetIssueById(ctx, issueId)
+
+	return r.projectService.UserInProject(ctx, project.Id)
 }
 
-func (r *issueService) GetIssuesByProject(projectId string) ([]*Issue, error) {
-	return r.issueRepo.GetIssuesByProject(projectId)
-}
-
-func (r *issueService) GetIssuesByUser(userId string) ([]*Issue, error) {
-	return r.issueRepo.GetIssuesByUser(userId)
-}
-
-func (r *issueService) CreateIssue(issue *Issue) error {
-	if err := validate.Validate(issue); err != nil {
-		return errs.Wrap(ErrIssueInvalid, "service.Issue.CreateIssue")
+func (r *issueService) GetIssueById(ctx context.Context, id string) (*Issue, error) {
+	if r.userAllowed(ctx, id) {
+		return r.issueRepo.GetIssueById(ctx, id)
+	} else {
+		return nil, errs.Wrap(utils.ErrNotAllowed, "service.Issue.GetIssueById")
 	}
-
-	//add the timestamps
-	issue.CreatedOn = time.Now().UTC().Unix()
-	issue.LastModifiedOn = time.Now().UTC().Unix()
-
-	return r.issueRepo.CreateIssue(issue)
 }
 
-func (r *issueService) PutIssue(issue *Issue) error {
-
-	if err := validate.Validate(issue); err != nil {
-		return errs.Wrap(ErrIssueInvalid, "service.Issue.PutIssue")
+func (r *issueService) GetIssuesByProject(ctx context.Context, projectId string) ([]*Issue, error) {
+	if r.projectService.UserInProject(ctx, projectId) {
+		return r.issueRepo.GetIssuesByProject(ctx, projectId)
+	} else {
+		return nil, errs.Wrap(utils.ErrNotAllowed, "service.Issue.GetIssuesByProject")
 	}
-
-	//update timestamp
-	currentTime := time.Now().UTC().Unix()
-	issue.LastModifiedOn = currentTime
-
-	if err := r.issueRepo.PutIssue(issue); err != nil {
-		return err
-	}
-
-	return nil
 }
 
-func (r *issueService) DeleteIssue(id string) error {
-	return r.issueRepo.DeleteIssue(id)
+func (r *issueService) GetIssuesByUser(ctx context.Context, userId string) ([]*Issue, error) {
+	if utils.GetUserFromContext(ctx) == userId {
+		return r.issueRepo.GetIssuesByUser(ctx, userId)
+	} else {
+		return nil, errs.Wrap(utils.ErrNotAllowed, "service.Issue.GetIssuesByUser")
+	}
+}
+
+func (r *issueService) CreateIssue(ctx context.Context, issue *Issue) error {
+	if r.projectService.UserInProject(ctx, issue.Project) {
+		if err := validate.Validate(issue); err != nil {
+			return errs.Wrap(ErrIssueInvalid, "service.Issue.CreateIssue")
+		}
+
+		//add the timestamps
+		issue.CreatedOn = time.Now().UTC().Unix()
+		issue.LastModifiedOn = time.Now().UTC().Unix()
+
+		return r.issueRepo.CreateIssue(ctx, issue)
+	} else {
+		return errs.Wrap(utils.ErrNotAllowed, "service.Issue.CreateIssue")
+	}
+}
+
+func (r *issueService) PutIssue(ctx context.Context, issue *Issue) error {
+	if r.projectService.UserInProject(ctx, issue.Project) {
+		if err := validate.Validate(issue); err != nil {
+			return errs.Wrap(ErrIssueInvalid, "service.Issue.PutIssue")
+		}
+
+		//update timestamp
+		currentTime := time.Now().UTC().Unix()
+		issue.LastModifiedOn = currentTime
+
+		if err := r.issueRepo.PutIssue(ctx, issue); err != nil {
+			return errs.Wrap(err, "service.Issue.PutIssue")
+		}
+
+		return nil
+	} else {
+		return errs.Wrap(utils.ErrNotAllowed, "service.Issue.PutIssue")
+	}
+}
+
+func (r *issueService) DeleteIssue(ctx context.Context, id string) error {
+	if r.userAllowed(ctx, id) {
+		return r.issueRepo.DeleteIssue(ctx, id)
+	} else {
+		return errs.Wrap(utils.ErrNotAllowed, "service.Issue.DeleteIssue")
+	}
 }

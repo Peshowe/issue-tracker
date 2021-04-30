@@ -34,7 +34,7 @@ func encodeProjects(p []*pr.Project) []*project.ProjectResponse {
 }
 
 func (s *projectServer) GetProjectsAll(ctx context.Context, request *project.ProjectsAllRequest) (*project.ProjectsResponse, error) {
-	projects, err := s.projectService.GetProjectsAll()
+	projects, err := s.projectService.GetProjectsAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (s *projectServer) GetProjectsAll(ctx context.Context, request *project.Pro
 
 func (s *projectServer) GetProjectById(ctx context.Context, request *project.ProjectByIdRequest) (*project.ProjectResponse, error) {
 	projectId := request.GetId()
-	proj, err := s.projectService.GetProjectById(projectId)
+	proj, err := s.projectService.GetProjectById(ctx, projectId)
 
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (s *projectServer) GetProjectById(ctx context.Context, request *project.Pro
 
 func (s *projectServer) GetProjectsByUser(ctx context.Context, request *project.ProjectsByUserRequest) (*project.ProjectsResponse, error) {
 	userId := request.GetUserId()
-	projects, err := s.projectService.GetProjectsByUser(userId)
+	projects, err := s.projectService.GetProjectsByUser(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (s *projectServer) CreateProject(ctx context.Context, request *project.Crea
 	p := &pr.Project{
 		Name: request.GetName(),
 	}
-	err := s.projectService.CreateProject(p)
+	err := s.projectService.CreateProject(ctx, p)
 
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func (s *projectServer) CreateProject(ctx context.Context, request *project.Crea
 
 func (s *projectServer) DeleteProject(ctx context.Context, request *project.DeleteRequest) (*project.GenericResponse, error) {
 	projectId := request.GetId()
-	err := s.projectService.DeleteProject(projectId)
+	err := s.projectService.DeleteProject(ctx, projectId)
 
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (s *projectServer) DeleteProject(ctx context.Context, request *project.Dele
 }
 
 func (s *projectServer) AddUser(ctx context.Context, request *project.UserRequest) (*project.GenericResponse, error) {
-	err := s.projectService.AddUser(request.GetProjectId(), request.GetUserId())
+	err := s.projectService.AddUser(ctx, request.GetProjectId(), request.GetUserId())
 
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (s *projectServer) AddUser(ctx context.Context, request *project.UserReques
 }
 
 func (s *projectServer) RemoveUser(ctx context.Context, request *project.UserRequest) (*project.GenericResponse, error) {
-	err := s.projectService.RemoveUser(request.GetProjectId(), request.GetUserId())
+	err := s.projectService.RemoveUser(ctx, request.GetProjectId(), request.GetUserId())
 
 	if err != nil {
 		return nil, err

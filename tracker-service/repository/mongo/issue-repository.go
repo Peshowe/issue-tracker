@@ -17,10 +17,7 @@ func (r *mongoRepository) getIssuesCollection() *mongo.Collection {
 }
 
 //GetIssueById returns a single issue that matches the given id
-func (r *mongoRepository) GetIssueById(id string) (*issue.Issue, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) GetIssueById(ctx context.Context, id string) (*issue.Issue, error) {
 	//get the collection
 	collection := r.getIssuesCollection()
 
@@ -71,10 +68,7 @@ func (r *mongoRepository) GetIssueById(id string) (*issue.Issue, error) {
 // }
 
 //GetIssuesByProject returns all issues in from the given project
-func (r *mongoRepository) GetIssuesByProject(projectId string) ([]*issue.Issue, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) GetIssuesByProject(ctx context.Context, projectId string) ([]*issue.Issue, error) {
 	//get the collection
 	collection := r.getIssuesCollection()
 
@@ -103,10 +97,7 @@ func (r *mongoRepository) GetIssuesByProject(projectId string) ([]*issue.Issue, 
 }
 
 //GetIssuesByUser returns all issues in which the given user is present
-func (r *mongoRepository) GetIssuesByUser(userId string) ([]*issue.Issue, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) GetIssuesByUser(ctx context.Context, userId string) ([]*issue.Issue, error) {
 	//get the collection
 	collection := r.getIssuesCollection()
 
@@ -132,10 +123,7 @@ func (r *mongoRepository) GetIssuesByUser(userId string) ([]*issue.Issue, error)
 }
 
 //CreateIssue adds a new issue to the database
-func (r *mongoRepository) CreateIssue(issueStrut *issue.Issue) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) CreateIssue(ctx context.Context, issueStrut *issue.Issue) error {
 	//get the collection
 	collection := r.getIssuesCollection()
 
@@ -149,10 +137,7 @@ func (r *mongoRepository) CreateIssue(issueStrut *issue.Issue) error {
 }
 
 //PutIssue updates an existing issue (completely replaces it)
-func (r *mongoRepository) PutIssue(issueStrut *issue.Issue) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) PutIssue(ctx context.Context, issueStrut *issue.Issue) error {
 	//get the collection
 	collection := r.getIssuesCollection()
 
@@ -178,10 +163,7 @@ func (r *mongoRepository) PutIssue(issueStrut *issue.Issue) error {
 }
 
 //DeleteIssue removes a issue from the database
-func (r *mongoRepository) DeleteIssue(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.timeout)
-	defer cancel()
-
+func (r *mongoRepository) DeleteIssue(ctx context.Context, id string) error {
 	//get the collection
 	collection := r.getIssuesCollection()
 
