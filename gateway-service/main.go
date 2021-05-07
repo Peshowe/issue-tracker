@@ -41,10 +41,10 @@ func main() {
 	// register the authentication endpoints
 	authentication.RegisterEndpoints(r)
 
-	// register the business logic API endpoints
+	// register the tracker service (i.e. business logic) API endpoints
 	r.Route("/v1", func(r chi.Router) {
-		// r.Use(authentication.AuthenticationMiddleware)
 		r.Use(utils.JsonContentTypeMiddleware)
+		r.Use(utils.GrpcJWTMiddleware(authentication.GetUser))
 		project.RegisterEndpoints(r, conn)
 		issue.RegisterEndpoints(r, conn)
 	})

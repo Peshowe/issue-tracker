@@ -3,6 +3,8 @@ package utils
 import (
 	"log"
 	"net/http"
+
+	"google.golang.org/grpc/metadata"
 )
 
 //HandleError handles any errors that might pop up
@@ -17,4 +19,14 @@ func JsonContentTypeMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
+}
+
+// GrpcJWTMiddleware builds a middleware used to add the JWT containing user data in the request's context (at the moment it's not actually using JWT)
+func GrpcJWTMiddleware(getUser func(*http.Request) string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r = r.WithContext(metadata.AppendToOutgoingContext(r.Context(), "token", getUser(r)))
+			next.ServeHTTP(w, r)
+		})
+	}
 }
