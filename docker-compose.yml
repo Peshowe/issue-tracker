@@ -4,18 +4,24 @@ services:
     image: gateway-service
     restart: unless-stopped
     ports:
-      - "80:8000"
+      - "80:3000"
       # - "443:443"
     depends_on: 
       - tracker-service
+
   tracker-service:
     image: tracker-service
     restart: unless-stopped
+    environment:
+      MONGO_ADDRESS: mongodb://mongo:27017
+      KAFKA_ADDRESS: kafka:9092
     # ports:
     #   - "80:4040"
       # - "443:443"
     depends_on: 
       - mongo
+      - kafka
+
   mongo:
     image: mongo
     restart: unless-stopped
@@ -23,6 +29,23 @@ services:
       - "27017:27017"
     volumes:
       - mongodata:/data/db
+  
+  zookeeper:
+    image: wurstmeister/zookeeper
+    # ports:
+    #   - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    restart: unless-stopped
+    # ports:
+    #   - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on: 
+      - zookeeper
+
 
 volumes:
   mongodata:
+  # kafkadata:
