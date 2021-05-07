@@ -3,8 +3,8 @@ package issue
 type Issue struct {
 	Id string `bson:"_id,omitempty"`
 
-	//Name of issue between 2 and 40 characters
-	Name string `bson:"name,omitempty" validate:"gte=2 & lte=40"`
+	//Name of issue between 2 and 80 characters
+	Name string `bson:"name,omitempty" validate:"gte=2 & lte=80"`
 
 	//Description (can be empty and shouldn't be more than 500 chars)
 	Desc string `bson:"desc,omitempty" validate:"lte=500"`

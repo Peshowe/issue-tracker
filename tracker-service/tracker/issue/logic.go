@@ -20,13 +20,16 @@ var (
 type issueService struct {
 	//reference to our repository (i.e. database)
 	issueRepo IssueRepository
+	//eventPublisher is a reference to the logic for publishing domain events
+	eventPublisher EventPublisher
 	//we need a reference to the project service to deal with authorization (this is not ideal)
 	projectService project.ProjectService
 }
 
-func NewIssueService(issueRepo IssueRepository, projectService project.ProjectService) IssueService {
+func NewIssueService(issueRepo IssueRepository, eventPublisher EventPublisher, projectService project.ProjectService) IssueService {
 	return &issueService{
 		issueRepo,
+		eventPublisher,
 		projectService,
 	}
 }
@@ -74,7 +77,18 @@ func (r *issueService) CreateIssue(ctx context.Context, issue *Issue) error {
 		issue.CreatedOn = time.Now().UTC().Unix()
 		issue.LastModifiedOn = time.Now().UTC().Unix()
 
-		return r.issueRepo.CreateIssue(ctx, issue)
+		if err := r.issueRepo.CreateIssue(ctx, issue); err != nil {
+			return errs.Wrap(err, "service.Issue.CreateIssue")
+		} else {
+			//publish the event
+			r.eventPublisher.PublishEvent(ctx, IssueEvent{
+				Type:  IssueCreatedEventType,
+				Issue: issue,
+			})
+
+			return nil
+		}
+
 	} else {
 		return errs.Wrap(utils.ErrNotAllowed, "service.Issue.CreateIssue")
 	}
@@ -92,9 +106,15 @@ func (r *issueService) PutIssue(ctx context.Context, issue *Issue) error {
 
 		if err := r.issueRepo.PutIssue(ctx, issue); err != nil {
 			return errs.Wrap(err, "service.Issue.PutIssue")
-		}
+		} else {
+			//publish the event
+			r.eventPublisher.PublishEvent(ctx, IssueEvent{
+				Type:  IssueUpdatedEventType,
+				Issue: issue,
+			})
 
-		return nil
+			return nil
+		}
 	} else {
 		return errs.Wrap(utils.ErrNotAllowed, "service.Issue.PutIssue")
 	}
@@ -102,7 +122,18 @@ func (r *issueService) PutIssue(ctx context.Context, issue *Issue) error {
 
 func (r *issueService) DeleteIssue(ctx context.Context, id string) error {
 	if r.userAllowed(ctx, id) {
-		return r.issueRepo.DeleteIssue(ctx, id)
+		if err := r.issueRepo.DeleteIssue(ctx, id); err != nil {
+			return errs.Wrap(err, "service.Issue.DeleteIssue")
+		} else {
+			//publish the event
+			r.eventPublisher.PublishEvent(ctx, IssueEvent{
+				Type:  IssueDeletedEventType,
+				Issue: &Issue{Id: id, User: utils.GetUserFromContext(ctx)},
+			})
+
+			return nil
+		}
+
 	} else {
 		return errs.Wrap(utils.ErrNotAllowed, "service.Issue.DeleteIssue")
 	}

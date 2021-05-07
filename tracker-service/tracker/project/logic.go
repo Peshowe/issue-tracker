@@ -20,12 +20,15 @@ var (
 type projectService struct {
 	//reference to our repository (i.e. database)
 	projectRepo ProjectRepository
+	//eventPublisher is a reference to the logic for publishing domain events
+	eventPublisher EventPublisher
 }
 
 //NewProjectService creates a new instance of the projectService that contains a reference to a repository
-func NewProjectService(projectRepo ProjectRepository) ProjectService {
+func NewProjectService(projectRepo ProjectRepository, eventPublisher EventPublisher) ProjectService {
 	return &projectService{
 		projectRepo,
+		eventPublisher,
 	}
 }
 

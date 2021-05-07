@@ -148,11 +148,17 @@ func (r *mongoRepository) PutIssue(ctx context.Context, issueStrut *issue.Issue)
 	}
 	filter := bson.M{"_id": idPrimitive}
 
+	//store the Id temporarily here
+	tempId := issueStrut.Id
 	//don't include the Id in the object
 	issueStrut.Id = ""
 
 	//update the db
 	_, err = collection.ReplaceOne(ctx, filter, issueStrut)
+
+	//restore the Id in the struct
+	issueStrut.Id = tempId
+
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return errors.Wrap(issue.ErrIssueNotFound, "repository.Issue.PutIssue")
