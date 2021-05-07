@@ -81,7 +81,7 @@ func (r *issueService) CreateIssue(ctx context.Context, issue *Issue) error {
 			return errs.Wrap(err, "service.Issue.CreateIssue")
 		} else {
 			//publish the event
-			r.eventPublisher.PublishEvent(ctx, IssueEvent{
+			go r.eventPublisher.PublishEvent(context.Background(), IssueEvent{
 				Type:  IssueCreatedEventType,
 				Issue: issue,
 			})
@@ -108,7 +108,7 @@ func (r *issueService) PutIssue(ctx context.Context, issue *Issue) error {
 			return errs.Wrap(err, "service.Issue.PutIssue")
 		} else {
 			//publish the event
-			r.eventPublisher.PublishEvent(ctx, IssueEvent{
+			go r.eventPublisher.PublishEvent(context.Background(), IssueEvent{
 				Type:  IssueUpdatedEventType,
 				Issue: issue,
 			})
@@ -122,13 +122,14 @@ func (r *issueService) PutIssue(ctx context.Context, issue *Issue) error {
 
 func (r *issueService) DeleteIssue(ctx context.Context, id string) error {
 	if r.userAllowed(ctx, id) {
+		issue, _ := r.issueRepo.GetIssueById(ctx, id)
 		if err := r.issueRepo.DeleteIssue(ctx, id); err != nil {
 			return errs.Wrap(err, "service.Issue.DeleteIssue")
 		} else {
 			//publish the event
-			r.eventPublisher.PublishEvent(ctx, IssueEvent{
+			go r.eventPublisher.PublishEvent(context.Background(), IssueEvent{
 				Type:  IssueDeletedEventType,
-				Issue: &Issue{Id: id, User: utils.GetUserFromContext(ctx)},
+				Issue: issue,
 			})
 
 			return nil

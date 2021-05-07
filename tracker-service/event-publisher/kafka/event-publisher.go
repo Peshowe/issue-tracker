@@ -32,7 +32,6 @@ func NewEventPublisher(kafkaAddress string) (tracker.EventPublisher, *kafka.Writ
 	w := &kafka.Writer{
 		Addr:     addr,
 		Balancer: &kafka.LeastBytes{},
-		// Topic:    issue.IssueEventChannel,
 	}
 
 	publisher := &eventPublisher{
