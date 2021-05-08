@@ -20,6 +20,7 @@ var dockerBuildArgs string = "build -t %s --rm %s"
 var serviceDirs []string = []string{
 	"tracker-service",
 	"gateway-service",
+	"mail-service",
 }
 
 //readArgs reads the CLI args passed (should be names of services to build)
