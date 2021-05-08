@@ -45,11 +45,13 @@ func startListening(ctx context.Context, r *kafka.Reader) <-chan []byte {
 		for {
 			m, err := r.ReadMessage(ctx)
 			if err != nil {
+				log.Println(err)
 				break
 			}
 			log.Printf("message at offset %d: %s = %s\n", m.Offset, string(m.Key), string(m.Value))
 			c <- m.Value
 		}
+		close(c)
 	}()
 
 	return c
@@ -61,4 +63,13 @@ func (e *eventSubscriber) GetIssueEventChannel(ctx context.Context) <-chan []byt
 
 func (e *eventSubscriber) GetProjectEventChannel(ctx context.Context) <-chan []byte {
 	return startListening(ctx, e.projectReader)
+}
+
+func (e *eventSubscriber) CloseChannels() {
+	if err := e.issueReader.Close(); err != nil {
+		log.Println("failed to close issue reader:", err)
+	}
+	if err := e.projectReader.Close(); err != nil {
+		log.Println("failed to close project reader:", err)
+	}
 }

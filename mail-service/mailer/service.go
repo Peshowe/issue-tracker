@@ -1,15 +1,16 @@
 package mailer
 
-import "context"
+import (
+	"context"
+
+	"github.com/go-gomail/gomail"
+)
 
 type MailService interface {
-	ListenForEvents(ctx context.Context) error
+	ListenForEvents(ctx context.Context, done chan bool) error
 
-	BuildMessageFromIssueEvent(ctx context.Context, event *IssueEvent) (string, error)
-	GetReceiverFromIssueEvent(ctx context.Context, event *IssueEvent) (string, error)
+	BuildMessageFromIssueEvent(ctx context.Context, event *IssueEvent) (*gomail.Message, error)
+	BuildMessageFromProjectEvent(ctx context.Context, event *ProjectEvent) (*gomail.Message, error)
 
-	BuildMessageFromProjectEvent(ctx context.Context, event *ProjectEvent) (string, error)
-	GetReceiverFromProjectEvent(ctx context.Context, event *ProjectEvent) (string, error)
-
-	SendMail(ctx context.Context, receiver string, message string) error
+	SendMail(ctx context.Context, message *gomail.Message) error
 }

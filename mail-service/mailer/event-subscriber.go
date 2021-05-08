@@ -44,4 +44,5 @@ type ProjectEvent struct {
 type EventSubscriber interface {
 	GetIssueEventChannel(context.Context) <-chan []byte
 	GetProjectEventChannel(context.Context) <-chan []byte
+	CloseChannels()
 }

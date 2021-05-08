@@ -1,7 +1,10 @@
 package mailer
 
-import "context"
+import (
+	"context"
+	"github.com/go-gomail/gomail"
+)
 
 type MailServer interface {
-	SendMail(ctx context.Context, receiver string, message string) error
+	SendMail(ctx context.Context, message *gomail.Message) error
 }
