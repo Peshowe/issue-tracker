@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package mailer;
+
+option go_package = "github.com/Peshowe/issue-tracker/mail-service/mailer";
+
+message UserPreferenceRequest {
+    string user = 1;
+}
+
+message UserPreference {
+    string user = 1;
+    bool is_mail_notification_on = 2; 
+}
+
+message GenericResponse{} // empty message
+
+service MailService {
+    rpc GetUserPreference(UserPreferenceRequest) returns (UserPreference);
+    rpc SetUserPreference(UserPreference) returns (GenericResponse); 
+}

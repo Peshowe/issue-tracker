@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package issue;
+
+option go_package = "github.com/Peshowe/issue-tracker/tracker-service/tracker/issue";
+
+message IssueByIdRequest {
+    string id = 1;
+}
+
+message IssueResponse {
+    string id = 1;
+    string name = 2;
+    string desc = 3;
+    string issue_type = 4;
+    string status = 5;
+    string bug_trace = 6;
+    string user = 7;
+    string project = 8;
+    int64 created_on = 9;
+    int64 last_modified_on = 10;
+}
+  
+message IssuesByProjectRequest {
+    string projectId = 1;
+}
+
+message IssuesByUserRequest {
+    string userId = 1;
+}
+
+message IssuesResponse {
+    repeated IssueResponse issues = 1;
+}
+
+message CreateRequest {
+    IssueResponse issue = 1;
+}
+
+message PutRequest {
+    IssueResponse issue = 1;
+}
+
+message DeleteRequest {
+    string id = 1;
+}
+
+message GenericResponse{} // empty message
+  
+service IssueService {
+    rpc GetIssueById(IssueByIdRequest) returns (IssueResponse);
+    rpc GetIssuesByProject(IssuesByProjectRequest) returns (IssuesResponse);
+    rpc GetIssuesByUser(IssuesByUserRequest) returns (IssuesResponse);
+
+    rpc CreateIssue(CreateRequest) returns (GenericResponse);
+    rpc PutIssue(PutRequest) returns (GenericResponse);
+    rpc DeleteIssue(DeleteRequest) returns (GenericResponse);
+}
