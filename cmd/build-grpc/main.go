@@ -24,12 +24,14 @@ var sourceDir string = "grpc-contract"
 var desinationtDirs []string = []string{
 	filepath.Join("tracker-service", "grpc-contract"),
 	filepath.Join("gateway-service", "grpc-contract"),
+	filepath.Join("mail-service", "grpc-contract"),
 }
 
 //protoPaths are the exact path to the proto files
 var protoPaths []string = []string{
 	filepath.Join(sourceDir, "tracker-service", "v1", "issue", "issue.proto"),
 	filepath.Join(sourceDir, "tracker-service", "v1", "project", "project.proto"),
+	filepath.Join(sourceDir, "mail-service", "v1", "mailer", "mailer.proto"),
 }
 
 //compileProto runs the proto compilation commands for the proto files
@@ -39,11 +41,6 @@ func compileProto() {
 		log.Println("Compiling: ", proto)
 		args := strings.Split(fmt.Sprintf(compileArgs, proto), " ")
 		utils.RunCommand(compileCommand, args)
-		// cmd := exec.Command(compileCommand, args...)
-		// err := cmd.Run()
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
 	}
 
 }
