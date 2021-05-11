@@ -6,6 +6,8 @@ services:
     ports:
       - "80:3000"
       # - "443:443"
+    environment: 
+      MOCK_USER: nedelevbg@gmail.com
     depends_on: 
       - tracker-service
 
@@ -14,6 +16,7 @@ services:
     restart: unless-stopped
     environment:
       MONGO_ADDRESS: mongodb://mongo:27017
+      MONGO_DB: "test-mongo"
       KAFKA_ADDRESS: kafka:9092
     # ports:
     #   - "80:4040"
@@ -29,6 +32,7 @@ services:
       SMTP_ADDRESS: smtp-server
       SMTP_PORT: 25
       MONGO_ADDRESS: mongodb://mongo:27017
+      MONGO_DB: "mail-service"
       KAFKA_ADDRESS: kafka:9092
     depends_on: 
       - mongo
