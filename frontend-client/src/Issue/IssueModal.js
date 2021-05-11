@@ -43,7 +43,6 @@ function IssueModal(props) {
 
     function onSubmit(issue) {
         setIsSubmitting(true);
-        console.log("Heeloo");
         props.onSubmit(issue)
             .then(
                 (result) => {

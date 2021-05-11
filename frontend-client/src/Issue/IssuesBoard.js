@@ -54,7 +54,8 @@ function IssuesBoard(props) {
                     issue_type: issue.issue_type,
                     bug_trace: issue.bug_trace,
                     status: "to do",
-                    project: props.projectId
+                    project: props.projectId,
+                    user: props.user
                 }
 
             })
@@ -62,7 +63,6 @@ function IssuesBoard(props) {
     }
 
     function putIssue(issue) {
-        console.log(issue)
         return fetch('/v1/issues', {
             method: 'PUT',
             headers: {

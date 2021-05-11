@@ -30,23 +30,24 @@ const A = styled.a`
   }
 `
 
-const List = () => (
+function List(props) {
+  return (
     <>
-        <Ul>
-            <Li>
-                <A active href='#'>Home</A>
-            </Li>
-            <Li>
-                <A href='#'>About</A>
-            </Li>
-            <Li>
-                <A href='#'>Work</A>
-            </Li>
-            <Li>
-                <A href='#'>Contact</A>
-            </Li>
-        </Ul>
+      <Ul>
+        <Li>
+          <A active href='#'>Home</A>
+        </Li>
+        <Li>
+          <A href='#'>About</A>
+        </Li>
+        <Li>
+          <A href='#'>Work</A>
+        </Li>
+        <Li>
+          <A href='#'>Contact</A>
+        </Li>
+      </Ul>
     </>
-)
-
+  )
+}
 export default List

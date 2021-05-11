@@ -47,7 +47,7 @@ const App = () => {
         <ToggleMenu user={user} />
         <BrowserRouter>
           <Switch>
-            <Route path="/projects/:projectId" component={Project} />
+            <Route path="/projects/:projectId" render={(props) => <Project user={user} {...props} />} />
             <Route path="/login" component={Login} />
             <Route path="/">
               <ProjectExplorer />

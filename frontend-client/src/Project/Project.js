@@ -45,7 +45,7 @@ function Project(props) {
                     "padding-top": "0.5em",
                     "padding-left": "1em"
                 }}>{project.name}</h2>
-                <IssuesBoard projectId={project.id} />
+                <IssuesBoard projectId={project.id} user={props.user} />
             </div>
         );
     }

@@ -31,7 +31,7 @@ function LogoutButton(props) {
             "float": "right",
             "paddingRight": "0.5em"
         }}>
-            {props.user}
+            Hi, {props.user}
             <Icon
                 size={48}
                 style={{
