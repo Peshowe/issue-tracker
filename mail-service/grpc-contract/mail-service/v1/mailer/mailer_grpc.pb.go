@@ -133,5 +133,5 @@ var MailService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "grpc-contract/mail-service/v1/mailer.proto",
+	Metadata: "grpc-contract/mail-service/v1/mailer/mailer.proto",
 }

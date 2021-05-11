@@ -13,4 +13,7 @@ type MailService interface {
 	BuildMessageFromProjectEvent(ctx context.Context, event *ProjectEvent) (*gomail.Message, error)
 
 	SendMail(ctx context.Context, message *gomail.Message) error
+
+	SetUserPreference(ctx context.Context, userPreference *UserPreference) error
+	GetUserPreference(ctx context.Context, user string) (*UserPreference, error)
 }

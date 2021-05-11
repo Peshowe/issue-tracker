@@ -2,13 +2,16 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
 
+	"github.com/Peshowe/issue-tracker/mail-service/api/grpc"
 	"github.com/Peshowe/issue-tracker/mail-service/event-decoder/bson"
 	"github.com/Peshowe/issue-tracker/mail-service/event-subscriber/kafka"
+	"github.com/Peshowe/issue-tracker/mail-service/mail-repo/mongo"
 	"github.com/Peshowe/issue-tracker/mail-service/mail-server/smtp"
 	"github.com/Peshowe/issue-tracker/mail-service/mailer"
 )
@@ -28,11 +31,27 @@ func main() {
 		smtpPort, _ = strconv.Atoi(os.Getenv("SMTP_PORT"))
 	}
 
+	mongoAddress := "mongodb://localhost:27017"
+	if os.Getenv("MONGO_ADDRESS") != "" {
+		mongoAddress = os.Getenv("MONGO_ADDRESS")
+	}
+	mongoDB := "mail-service"
+	if os.Getenv("MONGO_ADDRESS") != "" {
+		mongoDB = os.Getenv("MONGO_DB")
+	}
+
 	mailServer := smtp.NewMailServer(smtpAddress, smtpPort)
 	eventSubscriber := kafka.NewEventSubscriber(kafkaAddress)
 	eventDecoder := bson.NewEventDecoder()
+	mailRepo, err := mongo.NewMongoRepository(mongoAddress, mongoDB, 5)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	mailService := mailer.NewMailService(mailServer, eventSubscriber, eventDecoder)
+	mailService := mailer.NewMailService(mailServer, eventSubscriber, eventDecoder, mailRepo)
+
+	// start the GRPC server in a goroutine
+	go grpc.StartServer(mailService)
 
 	// done channel to stop listening for events
 	done := make(chan bool)
