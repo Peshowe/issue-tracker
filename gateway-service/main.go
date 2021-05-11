@@ -1,15 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/Peshowe/issue-tracker/gateway-service/authentication"
+	"github.com/Peshowe/issue-tracker/gateway-service/authentication/mock"
+	"github.com/Peshowe/issue-tracker/gateway-service/authentication/oauth2"
 	"github.com/Peshowe/issue-tracker/gateway-service/frontend"
+	"github.com/Peshowe/issue-tracker/gateway-service/gateway"
 	"github.com/Peshowe/issue-tracker/gateway-service/mailer-proxy/mailer"
 	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/issue"
 	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/project"
@@ -36,23 +40,40 @@ func main() {
 	// processing should be stopped.
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	authentication.LoginRedirect = frontend.LoginRedirect
-	authentication.AddAuthExceptionPath("/login")
+	var authenticator gateway.Authenticator
 
-	// register the authentication endpoints
-	authentication.RegisterEndpoints(r)
+	if mockUser, ok := os.LookupEnv("MOCK_USER"); ok {
+		log.Println("Using mock authentication!")
+		authenticator = mock.NewAuthenticator(mockUser)
+	} else {
+		authenticator = oauth2.NewAuthenticator()
+	}
+
+	authenticator.SetLoginRedirect(frontend.LoginRedirect)
+	authenticator.AddAuthExceptionPath("/login")
+
+	// register the authenticator endpoints
+	r.Route("/auth", func(r chi.Router) {
+
+		authenticator.RegisterEndpoints(r)
+		//expose an API endpoint for GetUser
+		r.Get("/user", func(w http.ResponseWriter, r *http.Request) {
+			userResp := map[string]string{"user": authenticator.GetUser(r)}
+			json.NewEncoder(w).Encode(userResp)
+		})
+	})
 
 	// register the tracker service (i.e. business logic) API endpoints
 	r.Route("/v1", func(r chi.Router) {
 		r.Use(utils.JsonContentTypeMiddleware)
-		r.Use(utils.GrpcJWTMiddleware(authentication.GetUser))
+		r.Use(utils.GrpcJWTMiddleware(authenticator.GetUser))
 		project.RegisterEndpoints(r, conn)
 		issue.RegisterEndpoints(r, conn)
 		mailer.RegisterEndpoints(r, conn)
 	})
 
 	r.Route("/", func(r chi.Router) {
-		frontend.RegisterEndpoints(r, authentication.AuthenticationMiddleware)
+		frontend.RegisterEndpoints(r, authenticator.AuthenticationMiddleware)
 	})
 
 	errs := make(chan error, 2)

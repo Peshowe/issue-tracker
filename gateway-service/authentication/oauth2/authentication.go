@@ -1,4 +1,4 @@
-package authentication
+package oauth2
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/Peshowe/issue-tracker/gateway-service/gateway"
 	"github.com/Peshowe/issue-tracker/gateway-service/utils"
 	"github.com/go-chi/chi"
 	"github.com/pkg/errors"
@@ -18,8 +19,14 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+type authenticator struct{}
+
+func NewAuthenticator() gateway.Authenticator {
+	return &authenticator{}
+}
+
 //store is a CookieStore where we'll be saving the user's authentication data
-var store = sessions.NewCookieStore([]byte("secret")) //os.Getenv("SESSION_KEY")
+var store = sessions.NewCookieStore([]byte(sessionSecret))
 var userSessionName string = "user-session"
 
 var oauthConfig *oauth2.Config
@@ -27,11 +34,16 @@ var oauthConfig *oauth2.Config
 //authExceptionPaths is the set of paths that do not require authentication (e.g. the login page)
 var authExceptionPaths map[string]interface{} = make(map[string]interface{})
 
-//LoginRedirect is the page to which we will redirect a user if they are not authenticated. By default it will automatically start the authentication (probably should be overwritten).
-var LoginRedirect func(http.ResponseWriter, *http.Request) = authBegin
+//loginRedirect is the page to which we will redirect a user if they are not authenticated. By default it will automatically start the authentication (probably should be overwritten using SetLoginRedirect).
+var loginRedirect func(http.ResponseWriter, *http.Request) = authBegin
+
+//SetLoginRedirect overrides the default loginRedirect with a custom login page
+func (a *authenticator) SetLoginRedirect(newRedirect func(http.ResponseWriter, *http.Request)) {
+	loginRedirect = newRedirect
+}
 
 // AuthenticationMiddleware is a middleware that makes sure users are authenticated before they are able to visit the endpoints
-func AuthenticationMiddleware(next http.Handler) http.Handler {
+func (a *authenticator) AuthenticationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		authenticationOk := true
@@ -63,7 +75,7 @@ func AuthenticationMiddleware(next http.Handler) http.Handler {
 				return
 			}
 			//redirect to a page that asks to login
-			LoginRedirect(w, r)
+			loginRedirect(w, r)
 		} else {
 			// everything is ok, carry on
 			next.ServeHTTP(w, r)
@@ -72,7 +84,7 @@ func AuthenticationMiddleware(next http.Handler) http.Handler {
 }
 
 // GetUser returns the currently authenticated user from the session
-func GetUser(r *http.Request) string {
+func (a *authenticator) GetUser(r *http.Request) string {
 	session, _ := store.Get(r, userSessionName)
 	if user, ok := session.Values["user"]; ok {
 		return user.(string)
@@ -81,14 +93,8 @@ func GetUser(r *http.Request) string {
 
 }
 
-// getUser exposes an API endpoint for GetUser
-func getUser(w http.ResponseWriter, r *http.Request) {
-	userResp := map[string]string{"user": GetUser(r)}
-	json.NewEncoder(w).Encode(userResp)
-}
-
 // AddAuthExceptionPath adds a path to the authExceptionPaths set
-func AddAuthExceptionPath(path string) error {
+func (a *authenticator) AddAuthExceptionPath(path string) error {
 	authExceptionPaths[path] = nil
 	return nil
 
@@ -205,15 +211,11 @@ func logout(w http.ResponseWriter, r *http.Request) {
 }
 
 // RegisterEndpoints registers the authentication endpoints in the router
-func RegisterEndpoints(r chi.Router) {
+func (a *authenticator) RegisterEndpoints(r chi.Router) {
 	authInit()
 
-	r.Route("/auth", func(r chi.Router) {
-
-		r.Get("/google/callback", authCallback)
-		r.Get("/google", authBegin)
-		r.Get("/user", getUser)
-		r.Get("/logout", logout)
-	})
+	r.Get("/google/callback", authCallback)
+	r.Get("/google", authBegin)
+	r.Get("/logout", logout)
 
 }
