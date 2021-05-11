@@ -134,7 +134,7 @@ func (r *mongoRepository) CreateIssue(ctx context.Context, issueStrut *issue.Iss
 	}
 
 	//put the Id of the newly created document in the strut
-	issueStrut.Id = res.InsertedID.(string)
+	issueStrut.Id = res.InsertedID.(primitive.ObjectID).String()
 
 	return nil
 }
