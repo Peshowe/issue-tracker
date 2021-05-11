@@ -16,7 +16,11 @@ func main() {
 	if os.Getenv("MONGO_ADDRESS") != "" {
 		mongoAddress = os.Getenv("MONGO_ADDRESS")
 	}
-	repo, err := mongo.NewMongoRepository(mongoAddress, "test-mongo", 5)
+	mongoDB := "test-mongo"
+	if os.Getenv("MONGO_ADDRESS") != "" {
+		mongoDB = os.Getenv("MONGO_DB")
+	}
+	repo, err := mongo.NewMongoRepository(mongoAddress, mongoDB, 5)
 	if err != nil {
 		log.Fatalln(err)
 	}

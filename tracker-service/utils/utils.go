@@ -31,19 +31,3 @@ func EncodeToBytes(p interface{}) []byte {
 
 	return res
 }
-
-//
-// type B struct {
-// 	Type  string `bson:"type,omitempty"`
-// 	Issue struct {
-// 		Id   string `bson:"_id,omitempty"`
-// 		Name string `bson:"name,omitempty"`
-// 	} `bson:"issue,omitempty"`
-// }
-
-// func DecodeToB(s []byte) *B {
-
-// 	res := &B{}
-// 	bson.Unmarshal(s, res)
-// 	return res
-// }

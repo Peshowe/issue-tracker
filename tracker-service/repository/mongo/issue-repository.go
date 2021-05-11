@@ -128,10 +128,13 @@ func (r *mongoRepository) CreateIssue(ctx context.Context, issueStrut *issue.Iss
 	collection := r.getIssuesCollection()
 
 	//insert into the db
-	_, err := collection.InsertOne(ctx, issueStrut)
+	res, err := collection.InsertOne(ctx, issueStrut)
 	if err != nil {
 		return errors.Wrap(err, "repository.Issue.CreateIssue")
 	}
+
+	//put the Id of the newly created document in the strut
+	issueStrut.Id = res.InsertedID.(string)
 
 	return nil
 }
