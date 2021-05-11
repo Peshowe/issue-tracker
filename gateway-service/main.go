@@ -10,6 +10,7 @@ import (
 
 	"github.com/Peshowe/issue-tracker/gateway-service/authentication"
 	"github.com/Peshowe/issue-tracker/gateway-service/frontend"
+	"github.com/Peshowe/issue-tracker/gateway-service/mailer-proxy/mailer"
 	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/issue"
 	"github.com/Peshowe/issue-tracker/gateway-service/tracker-proxy/project"
 	"github.com/Peshowe/issue-tracker/gateway-service/utils"
@@ -47,6 +48,7 @@ func main() {
 		r.Use(utils.GrpcJWTMiddleware(authentication.GetUser))
 		project.RegisterEndpoints(r, conn)
 		issue.RegisterEndpoints(r, conn)
+		mailer.RegisterEndpoints(r, conn)
 	})
 
 	r.Route("/", func(r chi.Router) {
