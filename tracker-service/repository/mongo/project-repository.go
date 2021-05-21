@@ -136,13 +136,9 @@ func (r *mongoRepository) AddUser(ctx context.Context, projectId string, userId 
 	filter := bson.M{"_id": idPrimitive}
 
 	//construct the update statement
-	idPrimitive, err = primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Project.AddUser")
-	}
 	update := bson.D{
 		//we'll use addToSet here, although push should work just as well
-		{"$addToSet", bson.D{{"users", idPrimitive}}},
+		{"$addToSet", bson.D{{"users", userId}}},
 	}
 
 	//update the db
@@ -169,12 +165,8 @@ func (r *mongoRepository) RemoveUser(ctx context.Context, projectId string, user
 	filter := bson.M{"_id": idPrimitive}
 
 	//construct the update statement
-	idPrimitive, err = primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return errors.Wrap(err, "repository.Project.RemoveUser")
-	}
 	update := bson.D{
-		{"$pull", bson.D{{"users", idPrimitive}}},
+		{"$pull", bson.D{{"users", userId}}},
 	}
 
 	//update the db

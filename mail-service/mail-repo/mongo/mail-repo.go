@@ -99,7 +99,7 @@ func (r *mongoRepository) GetUserPreference(ctx context.Context, user string) (*
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			//it's ok if there are no entries
-			return nil, nil
+			return userPreference, nil
 		}
 		return nil, errors.Wrap(err, "mailRepo.GetUserPreference")
 	}

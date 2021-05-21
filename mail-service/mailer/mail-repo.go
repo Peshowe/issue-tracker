@@ -3,7 +3,7 @@ package mailer
 import "context"
 
 type UserPreference struct {
-	User                 string `bson:"name,omitempty"`
+	User                 string `bson:"user,omitempty"`
 	IsMailNotificationOn bool   `bson:"is_mail_notification_on,omitempty"`
 }
 

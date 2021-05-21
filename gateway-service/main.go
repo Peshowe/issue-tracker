@@ -24,7 +24,11 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial("tracker-service:4040", grpc.WithInsecure())
+	trackerGrpcConn, err := grpc.Dial("tracker-service:4040", grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	mailerGrpcConn, err := grpc.Dial("mail-service:4040", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
@@ -67,9 +71,9 @@ func main() {
 	r.Route("/v1", func(r chi.Router) {
 		r.Use(utils.JsonContentTypeMiddleware)
 		r.Use(utils.GrpcJWTMiddleware(authenticator.GetUser))
-		project.RegisterEndpoints(r, conn)
-		issue.RegisterEndpoints(r, conn)
-		mailer.RegisterEndpoints(r, conn)
+		project.RegisterEndpoints(r, trackerGrpcConn)
+		issue.RegisterEndpoints(r, trackerGrpcConn)
+		mailer.RegisterEndpoints(r, mailerGrpcConn)
 	})
 
 	r.Route("/", func(r chi.Router) {
