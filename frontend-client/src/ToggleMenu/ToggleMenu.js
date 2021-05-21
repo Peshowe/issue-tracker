@@ -18,7 +18,39 @@ const MenuIcon = styled(BurgerIcon)`
 `
 
 function ToggleMenu(props) {
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false);
+
+    let menu;
+    let buttons;
+
+    if (props.user == "") {
+        menu = <Menu />
+        buttons = <span></span>
+    } else {
+        menu = (<Menu>
+            <>
+                <Close onClose={() => setIsOpen(false)} />
+                <List user={props.user} />
+            </>
+        </Menu>)
+        buttons = (<span>
+            <BackButton />
+            <MenuIcon
+                size={48}
+                style={{
+                    borderRadius: '6px',
+                    padding: '8px',
+                    cursor: 'pointer'
+
+                }}
+                onClick={() => { setIsOpen((isOpen) => !isOpen) }}
+            />
+
+            <GitHub />
+
+            <LogoutButton user={props.user} />
+        </span>)
+    }
 
     return (
         <div>
@@ -27,23 +59,7 @@ function ToggleMenu(props) {
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
             >
-                <span hidden={props.user == ""}>
-                    <BackButton />
-                    <MenuIcon
-                        size={48}
-                        style={{
-                            borderRadius: '6px',
-                            padding: '8px',
-                            cursor: 'pointer'
-
-                        }}
-                        onClick={() => { setIsOpen((isOpen) => !isOpen) }}
-                    />
-
-                    <GitHub />
-
-                    <LogoutButton user={props.user} />
-                </span>
+                {buttons}
 
                 <span style={{
                     "padding": '8px',
@@ -51,14 +67,8 @@ function ToggleMenu(props) {
                     "margin-left": "1em"
                 }}>Parvus JIRA</span>
 
+                {menu}
 
-
-                <Menu>
-                    <>
-                        <Close onClose={() => setIsOpen(false)} />
-                        <List />
-                    </>
-                </Menu>
 
                 <Overlay />
             </StyledOffCanvas>

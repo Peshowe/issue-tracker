@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components'
 
 const Ul = styled.ul`
@@ -13,7 +13,7 @@ const Li = styled.li`
   padding: 0;
 `
 
-const A = styled.a`
+const MyDiv = styled.div`
   border-bottom: 1px solid #efefef;
   color: ${props => props.active ? 'rgba(218, 135, 196)' : '#333'};
   display: block;
@@ -31,20 +31,61 @@ const A = styled.a`
 `
 
 function List(props) {
+
+  const [userPreference, setUserPreference] = useState("");
+  const [error, setError] = useState(null);
+
+  function putUserPreference(event) {
+    setUserPreference(event.target.value)
+    fetch('/v1/mailer/preferences', {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user: props.user,
+        is_mail_notification_on: (event.target.value == "true")
+
+      })
+    }).then(
+      (error) => {
+        setError(error);
+      }
+    );
+  }
+
+  useEffect(() => {
+    fetch(`v1/mailer/preferences/${props.user}`)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          if (result["is_mail_notification_on"] == null) {
+            setUserPreference("false");
+          } else {
+            setUserPreference(result["is_mail_notification_on"]);
+          }
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          setError(error);
+        }
+      )
+  }, [])
+
   return (
     <>
       <Ul>
         <Li>
-          <A active href='#'>Home</A>
-        </Li>
-        <Li>
-          <A href='#'>About</A>
-        </Li>
-        <Li>
-          <A href='#'>Work</A>
-        </Li>
-        <Li>
-          <A href='#'>Contact</A>
+          <MyDiv>
+            Mail notifications:
+            <select value={userPreference} onChange={putUserPreference}>
+              <option value="true">On</option>
+              <option value="false">Off</option>
+            </select>
+          </MyDiv>
         </Li>
       </Ul>
     </>

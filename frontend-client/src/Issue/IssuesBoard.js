@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import LoadSpinner from '../LoadSpinner';
 import IssueModal from './IssueModal';
+import AddUserModal from '../Project/AddUser';
+import LeaveProjectModal from '../Project/LeaveProject';
 
 function IssuesBoard(props) {
 
@@ -55,7 +57,7 @@ function IssuesBoard(props) {
                     bug_trace: issue.bug_trace,
                     status: "to do",
                     project: props.projectId,
-                    user: props.user
+                    user: issue.user
                 }
 
             })
@@ -155,7 +157,7 @@ function IssuesBoard(props) {
     function createDraggableIssues(issues) {
         const draggableIssues = []
         for (const [index, value] of issues.entries()) {
-            draggableIssues.push(<Draggable bounds="#board" onDrag={(e) => onStop(e, value)} ><div className="listItem"><IssueModal issue={value} onSubmit={putIssue} onDone={() => ""} /></div></Draggable>);
+            draggableIssues.push(<Draggable bounds="#board" onDrag={(e) => onStop(e, value)} ><div className="listItem"><IssueModal issue={value} user={props.user} users={props.users} onSubmit={putIssue} onDone={() => ""} /></div></Draggable>);
         }
 
         return draggableIssues;
@@ -180,8 +182,11 @@ function IssuesBoard(props) {
                 style={
                     { "padding": "1.5em" }
                 }>
-
-                <IssueModal projectId={props.projectId} onSubmit={postIssue} issue={null} onDone={fetchIssues} />
+                <div>
+                    <IssueModal projectId={props.projectId} user={props.user} users={props.users} onSubmit={postIssue} issue={null} onDone={fetchIssues} />
+                    <AddUserModal projectId={props.projectId} />
+                    <LeaveProjectModal projectId={props.projectId} user={props.user} />
+                </div>
                 <br />
                 <div id="board" className="row" style={{ position: 'relative', overflow: 'auto', padding: '0' }}>
                     <div id={statusCols[0]} className="column">

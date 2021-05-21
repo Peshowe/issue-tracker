@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import LoadSpinner from '../LoadSpinner';
 
-import IssueForm from "./IssueForm";
-
 import Modal from "styled-react-modal";
 
 const StyledModal = Modal.styled`
-  width: 70rem;
-  height: 40rem;
+  width: 30rem;
+  height: 20rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,15 +13,13 @@ const StyledModal = Modal.styled`
   opacity: ${(props) => props.opacity};
   transition : all 0.3s ease-in-out;`;
 
-function IssueModal(props) {
+function LeaveProjectModal(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [opacity, setOpacity] = useState(0);
-
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState(null);
 
     function toggleModal(e) {
-        e.stopPropagation();
         setOpacity(0);
         setIsOpen(!isOpen);
     }
@@ -41,15 +37,27 @@ function IssueModal(props) {
         });
     }
 
-    function onSubmit(issue) {
-        setIsSubmitting(true);
-        props.onSubmit(issue)
+    function deleteUser() {
+        setIsSubmitting(true)
+        fetch('/v1/projects/users', {
+            method: 'DELETE',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                projectId: props.projectId,
+                userId: props.user
+            })
+        })
+            // .then(res => res.json)
             .then(
                 (result) => {
-                    setIsSubmitting(false)
+                    setIsSubmitting(false);
                     //close the modal
                     setIsOpen(false);
-                    props.onDone();
+                    // props.onCreate();
+
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -59,18 +67,15 @@ function IssueModal(props) {
                     setError(error);
                 }
             );
-    }
 
-    const submitLabel = props.issue == null ? "Create Issue" : "Update Issue"
-    const toggleLabel = props.issue == null ? "New Issue" : props.issue.name
+
+    }
 
     return (
         <
-            // style={{
-            //     "padding": "1.5em"
-            // }}
+
             >
-            <button onClick={toggleModal} className="btn btn-primary">{toggleLabel}</button>
+            <button onClick={toggleModal} className="btn btn-primary" style={{ "float": "right" }}>Leave Project</button>
             <StyledModal
                 isOpen={isOpen}
                 afterOpen={afterOpen}
@@ -87,7 +92,11 @@ function IssueModal(props) {
                     } else if (error) {
                         return <div>Error: {error.message}</div>;
                     } else {
-                        return <IssueForm buttonHandler={onSubmit} buttonLabel={submitLabel} issue={props.issue} user={props.user} users={props.users} />
+                        return (<div>
+                            Are you sure you want to leave the project?
+
+                            <button onClick={deleteUser} className="btn btn-primary">Yes, leave</button>
+                        </div>)
                     }
                 })()}
 
@@ -96,4 +105,4 @@ function IssueModal(props) {
     )
 }
 
-export default IssueModal;
+export default LeaveProjectModal

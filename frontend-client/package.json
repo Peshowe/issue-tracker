@@ -11,6 +11,7 @@
     "react-draggable": "^4.4.3",
     "react-epic-spinners": "^0.5.0",
     "react-scripts": "4.0.3",
+    "react-select": "^4.3.1",
     "styled-icons": "^10.31.0",
     "styled-off-canvas": "^1.0.1",
     "styled-react-modal": "^2.0.1",
