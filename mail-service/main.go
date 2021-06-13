@@ -39,11 +39,13 @@ func main() {
 	if os.Getenv("MONGO_ADDRESS") != "" {
 		mongoDB = os.Getenv("MONGO_DB")
 	}
+	mongoUser := os.Getenv("MONGO_USER")
+	mongoPass := os.Getenv("MONGO_PASS")
 
 	mailServer := smtp.NewMailServer(smtpAddress, smtpPort)
 	eventSubscriber := kafka.NewEventSubscriber(kafkaAddress)
 	eventDecoder := bson.NewEventDecoder()
-	mailRepo, err := mongo.NewMongoRepository(mongoAddress, mongoDB, 5)
+	mailRepo, err := mongo.NewMongoRepository(mongoAddress, mongoDB, mongoUser, mongoPass, 5)
 	if err != nil {
 		log.Fatalln(err)
 	}

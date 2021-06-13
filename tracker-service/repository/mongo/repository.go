@@ -20,11 +20,23 @@ type mongoRepository struct {
 }
 
 //newMongoClient creates a MongoDB client to a db hosted at the given mongoURL
-func newMongoClient(mongoURL string, mongoTimeout int) (*mongo.Client, error) {
+func newMongoClient(mongoURL, mongoUser, mongoPass string, mongoTimeout int) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(mongoTimeout)*time.Second)
 	defer cancel()
+
+	//define the options
+	opts := options.Client().ApplyURI(mongoURL)
+
+	if mongoUser != "" && mongoPass != "" {
+		credentials := options.Credential{
+			Username: mongoUser,
+			Password: mongoPass,
+		}
+		opts = opts.SetAuth(credentials)
+	}
+
 	//create the connection
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURL))
+	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -37,12 +49,12 @@ func newMongoClient(mongoURL string, mongoTimeout int) (*mongo.Client, error) {
 }
 
 //NewMongoRepository creates a mongoRepository instance (that implements the TrackerRepository interface)
-func NewMongoRepository(mongoURL, mongoDB string, mongoTimeout int) (tracker.TrackerRepository, error) {
+func NewMongoRepository(mongoURL, mongoDB, mongoUser, mongoPass string, mongoTimeout int) (tracker.TrackerRepository, error) {
 	repo := &mongoRepository{
 		timeout:  time.Duration(mongoTimeout) * time.Second,
 		database: mongoDB,
 	}
-	client, err := newMongoClient(mongoURL, mongoTimeout)
+	client, err := newMongoClient(mongoURL, mongoUser, mongoPass, mongoTimeout)
 	if err != nil {
 		return nil, errors.Wrap(err, "repository.NewMongoRepo")
 	}

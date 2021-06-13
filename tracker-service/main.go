@@ -20,7 +20,9 @@ func main() {
 	if os.Getenv("MONGO_ADDRESS") != "" {
 		mongoDB = os.Getenv("MONGO_DB")
 	}
-	repo, err := mongo.NewMongoRepository(mongoAddress, mongoDB, 5)
+	mongoUser := os.Getenv("MONGO_USER")
+	mongoPass := os.Getenv("MONGO_PASS")
+	repo, err := mongo.NewMongoRepository(mongoAddress, mongoDB, mongoUser, mongoPass, 5)
 	if err != nil {
 		log.Fatalln(err)
 	}
