@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: smtp-server
+  name: smtp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smtp-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: smtp-server
+    spec:
+      containers:
+      - image: bytemark/smtp
+        imagePullPolicy: ""
+        name: smtp-server
+        resources: {}
+        env:
+        - name: MAILNAME
+          value: smtp-server
+        ports:
+        - containerPort: 25
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: smtp-service
+spec:
+  selector:
+    app: smtp-server
+  ports:
+    - protocol: TCP
+      port: 25
+      targetPort: 25

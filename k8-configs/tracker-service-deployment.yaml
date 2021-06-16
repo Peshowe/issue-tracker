@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracker-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracker-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: tracker-app
+    spec:
+      containers:
+      - name: tracker-app
+        image: pnedelev/tracker-service:latest
+        imagePullPolicy: Always
+        env:
+        - name: KAFKA_ADDRESS
+          value: kafka:9092
+        - name: MONGO_ADDRESS
+          value: mongodb://mongo-service:27017
+        - name: MONGO_DB
+          value: tracker-service
+        - name: MONGO_USER
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-username
+        - name: MONGO_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-password
+        ports:
+        - containerPort: 4040
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracker-service
+spec:
+  selector:
+    app: tracker-app
+  ports:
+    - protocol: TCP
+      port: 4040
+      targetPort: 4040
