@@ -23,7 +23,9 @@ function ProjectExplorer() {
             .then(
                 (result) => {
                     setIsLoaded(true);
-                    setProjects(result.projects);
+                    if (result.projects != undefined) {
+                        setProjects(result.projects);
+                    }
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
