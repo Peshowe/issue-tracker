@@ -14,7 +14,7 @@ type eventSubscriber struct {
 }
 
 func NewEventSubscriber(kafkaAddress string) mailer.EventSubscriber {
-	// make a new reader that consumes from topic-A, partition 0, at offset 42
+	// make new readers for each topic
 	issueReader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   []string{kafkaAddress},
 		Topic:     mailer.IssueEventChannel,

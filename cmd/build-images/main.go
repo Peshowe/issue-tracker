@@ -16,6 +16,12 @@ var dockerCommand string = "docker"
 //dockerBuildArgs are the arguements for the build command
 var dockerBuildArgs string = "build -t %s --rm %s"
 
+//dockerTagArgs are the arguements for the tag command
+var dockerTagArgs string = "tag %s pnedelev/%s"
+
+//dockerPushArgs are the arguements for the push command
+var dockerPushArgs string = "push pnedelev/%s"
+
 //serviceDirs are the directories of each of the services
 var serviceDirs []string = []string{
 	"tracker-service",
@@ -34,6 +40,10 @@ func buildImages(services []string) {
 	for _, service := range services {
 		log.Println("Building: ", service)
 		args := strings.Split(fmt.Sprintf(dockerBuildArgs, service, service), " ")
+		utils.RunCommand(dockerCommand, args)
+		args = strings.Split(fmt.Sprintf(dockerTagArgs, service, service), " ")
+		utils.RunCommand(dockerCommand, args)
+		args = strings.Split(fmt.Sprintf(dockerPushArgs, service), " ")
 		utils.RunCommand(dockerCommand, args)
 	}
 

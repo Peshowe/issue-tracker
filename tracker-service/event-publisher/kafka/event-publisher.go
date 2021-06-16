@@ -23,9 +23,9 @@ type eventPublisher struct {
 func NewEventPublisher(kafkaAddress string) (tracker.EventPublisher, *kafka.Writer, error) {
 
 	// create the topics
-	if err := createTopics(kafkaAddress, issue.IssueEventChannel, project.ProjectEventChannel); err != nil {
-		return nil, nil, err
-	}
+	// if err := createTopics(kafkaAddress, issue.IssueEventChannel, project.ProjectEventChannel); err != nil {
+	// 	return nil, nil, err
+	// }
 
 	// make a writer that produces messages, using the least-bytes distribution (without specifying a topic here)
 	addr := kafka.TCP(kafkaAddress)

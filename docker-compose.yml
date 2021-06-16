@@ -1,18 +1,18 @@
 version: '3'
 services:
   gateway-service:
-    image: gateway-service
+    image: pnedelev/gateway-service
     restart: unless-stopped
     ports:
       - "80:3000"
       # - "443:443"
-    environment: 
-      MOCK_USER: nedelevbg@gmail.com
+    # environment: 
+    #   MOCK_USER: nedelevbg@gmail.com
     depends_on: 
       - tracker-service
 
   tracker-service:
-    image: tracker-service
+    image: pnedelev/tracker-service
     restart: unless-stopped
     environment:
       MONGO_ADDRESS: mongodb://mongo:27017
@@ -26,7 +26,7 @@ services:
       - kafka
 
   mail-service:
-    image: mail-service
+    image: pnedelev/mail-service
     restart: unless-stopped
     environment:
       SMTP_ADDRESS: smtp-server
@@ -46,8 +46,8 @@ services:
   mongo:
     image: mongo
     restart: unless-stopped
-    ports:
-      - "27017:27017"
+    # ports:
+    #   - "27017:27017"
     volumes:
       - mongodata:/data/db
   

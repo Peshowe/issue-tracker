@@ -17,7 +17,7 @@ func main() {
 		mongoAddress = os.Getenv("MONGO_ADDRESS")
 	}
 	mongoDB := "test-mongo"
-	if os.Getenv("MONGO_ADDRESS") != "" {
+	if os.Getenv("MONGO_DB") != "" {
 		mongoDB = os.Getenv("MONGO_DB")
 	}
 	mongoUser := os.Getenv("MONGO_USER")

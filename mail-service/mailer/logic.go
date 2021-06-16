@@ -93,8 +93,7 @@ func (m *mailService) BuildMessageFromIssueEvent(ctx context.Context, event *Iss
 
 	message := gomail.NewMessage()
 
-	// receivers = []string{event.Issue.User}
-	receivers = []string{"nedelevbg@gmail.com"}
+	receivers = []string{event.Issue.User}
 
 	//check user notification preferences
 	i := 0 // output index
